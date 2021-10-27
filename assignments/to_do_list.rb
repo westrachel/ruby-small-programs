@@ -1,4 +1,4 @@
-# Problem: build out the ToDoList class to achieve the desired output below
+# Problem: Part 1 - build out the ToDoList class to achieve the desired output below
 
 # Based on desired output below the following needs to be create in the ToDoList class:
 #    i. An add instance method that will add the passed in argument
@@ -25,6 +25,20 @@
 #    vii. custom to_s instance method that prints out a string representation of the @todos instance variable
 #        with the header "----Today's Todos----"
 
+# Problem: Part 2 - implement a ToDoList#each method
+#    > this method should accept a block and then pass in each ToDo object to the block
+#    > since each returns the calling object, in this case where the calling object is the
+#       array that the @todos instance variable points to, the @todos instance variable should
+#        be returned
+#       > there is a getter method for @todos, so can use that
+
+# Example of invoking the ToDoList#each method:
+# list.each do |todo|
+#   puts todo   # should call ToDo#to_s
+# end
+
+# Problem Part 3 - implement a ToDoList#select method
+#   > can use ToDoList#each to iterate over @todos, and then need to apply selection
 
 class ToDo
   DONE_MARKER = 'X'
@@ -131,6 +145,25 @@ class ToDoList
     todos.map { |todo| todo.to_s }
   end
 
+  def each
+    index = 0
+    until index == todos.size
+      yield(todos[index])
+      index += 1
+    end
+    todos
+  end
+
+  def select
+    index = 0
+    selected = []
+    until index == todos.size
+      selected << todos[index] if yield(todos[index])
+      index += 1
+    end
+    selected
+  end
+
   def to_s
     puts "---- Today's Todos ----"
     if current_list.empty?
@@ -152,8 +185,6 @@ todo3 = ToDo.new("Go to gym")
 list = ToDoList.new("Today's Todos")
 
 # ---- Adding to the list -----
-
-# add
 p list.add(todo1)       # should add todo1 to end of list, returns list
 # ---- Today's Todos ----
 # [ ] Buy groceries
@@ -257,3 +288,27 @@ p list.remove_at(0)             # removes and returns the 1st item
 list.to_s                      # returns string representation of the list
 #---- Today's Todos ----
 #Everything is complete!
+
+
+
+# Check that custom ToDoList#each method works as intended
+todo4 = ToDo.new("Walk Dog")
+list.add(todo4)
+
+list.each do |todo|
+  puts todo
+end
+
+# Check that custom ToDoList#select method works as intended
+list2 = ToDoList.new("Tomorrow's Todos")
+todo5 = ToDo.new("Take out recycling")
+list2.add(todo4)
+list2.add(todo5)
+
+todo4.done!
+
+results = list2.select { |todo| todo.done? }
+
+puts results.inspect # only the ToDo object that todo4 points to should have been selected
+# => [#<ToDo:0x00000000023a7f58 @title="Walk Dog", @description="", @done=true>]
+# <=> return value matches expectations
