@@ -40,6 +40,14 @@
 # Problem Part 3 - implement a ToDoList#select method
 #   > can use ToDoList#each to iterate over @todos, and then need to apply selection
 
+# Problem Part 4 - update the ToDoList#select method to return a new ToDoList
+#     object to be more in line with Ruby's core library
+#   > Hash#select returns a new hash
+#   > Array#select returns a new array
+
+# Problem Part 5 - update the ToDoList#Each method to return the calling ToDoList
+#     object instead of the @todos array to be more in line with Ruby's core library
+
 class ToDo
   DONE_MARKER = 'X'
   UNDONE_MARKER = ' '
@@ -151,17 +159,17 @@ class ToDoList
       yield(todos[index])
       index += 1
     end
-    todos
+    self
   end
 
   def select
     index = 0
-    selected = []
+    new_list = ToDoList.new("More ToDo's")
     until index == todos.size
-      selected << todos[index] if yield(todos[index])
+      new_list.add(todos[index]) if yield(todos[index])
       index += 1
     end
-    selected
+    new_list
   end
 
   def to_s
@@ -309,6 +317,15 @@ todo4.done!
 
 results = list2.select { |todo| todo.done? }
 
-puts results.inspect # only the ToDo object that todo4 points to should have been selected
+# Problem Part 3 - check
+#puts results.inspect # only the ToDo object that todo4 points to should have been selected
 # => [#<ToDo:0x00000000023a7f58 @title="Walk Dog", @description="", @done=true>]
 # <=> return value matches expectations
+
+# Problem Part 4 - check - now the return should be a new ToDoList object with completed
+#  tasks
+puts results.inspect
+# #<ToDoList:0x00000000024eead8 @title="More ToDo's",
+# @todos=[#<ToDo:0x00000000024ef2a8 @title="Walk Dog", @description="", @done=true>]>
+# <=> return value is a new ToDoList object as expected; made the @title in the custom
+#   ToDoList#select method always be initialized to the string "More ToDo's"
