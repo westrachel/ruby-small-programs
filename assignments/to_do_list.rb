@@ -48,6 +48,16 @@
 # Problem Part 5 - update the ToDoList#Each method to return the calling ToDoList
 #     object instead of the @todos array to be more in line with Ruby's core library
 
+# Problem Part 6 - add more ToDoList methods that build off of ToDoList#each and
+#   ToDoList#select
+#        > find_by_title(string_title): return first ToDo object whose @title instance
+#            variable points to a string with the same value as the string argument that's
+#            passed in, otherwise return nil
+#        > all_done & all_not_done: return all done (or undone) items in a new ToDoList object
+#        > mark_done(string_title): mark first ToDo object whose @title instance variable points
+#           to a string with the same value as the string argument that's passed in
+#        > mark_all_done & mark_all_undone
+
 class ToDo
   DONE_MARKER = 'X'
   UNDONE_MARKER = ' '
@@ -170,6 +180,42 @@ class ToDoList
       index += 1
     end
     new_list
+  end
+
+  def mark_all_done
+    each { |todo| todo.done! }
+  end
+
+  def mark_all_undone
+    each { |todo| todo.undone! }
+  end
+
+  def all_done
+    select do |todo|
+      todo.done?
+    end
+  end
+
+  def all_not_done
+    select do |todo|
+      todo.done? == false
+    end
+  end
+
+  def mark_done(str_title)
+    each do |todo|
+      if todo.title == str_title
+        todo.done!
+        break # break execution after find first match
+      end
+    end
+  end
+
+  def find_by_title(str)
+    matching_title = select do |todo|
+      todo.title == str
+    end # matching title is a new ToDoList object
+    matching_title.first # use previously defined first method
   end
 
   def to_s
@@ -297,8 +343,6 @@ list.to_s                      # returns string representation of the list
 #---- Today's Todos ----
 #Everything is complete!
 
-
-
 # Check that custom ToDoList#each method works as intended
 todo4 = ToDo.new("Walk Dog")
 list.add(todo4)
@@ -324,8 +368,44 @@ results = list2.select { |todo| todo.done? }
 
 # Problem Part 4 - check - now the return should be a new ToDoList object with completed
 #  tasks
-puts results.inspect
+p results
 # #<ToDoList:0x00000000024eead8 @title="More ToDo's",
 # @todos=[#<ToDo:0x00000000024ef2a8 @title="Walk Dog", @description="", @done=true>]>
 # <=> return value is a new ToDoList object as expected; made the @title in the custom
 #   ToDoList#select method always be initialized to the string "More ToDo's"
+
+# Problem Part 6 - Check Additionally added methods:
+results2 = list2.all_done
+p results2 # should return a ToDoList object w/ just todo4 in it like results above
+# #<ToDoList:0x0000000001f89ac0 @title="More ToDo's", @todos=[#<ToDo:0x0000000001f8a6a0 @title="Walk Dog", 
+# @description="", @done=true>]>
+
+list2.mark_all_done
+p list2.done? == true
+# => true
+list2.mark_all_undone
+p list2.done? == false
+# => true
+
+list2.add(ToDo.new("Walk Dog")) # add another ToDo object w/ the title "Walk Dog" to test
+# the created mark_done method
+
+p list2.all_not_done 
+#<ToDoList:0x0000000001c1a150 @title="More ToDo's", 
+#   @todos=[#<ToDo:0x0000000001c1b528 @title="Walk Dog", @description="", @done=false>, 
+#           #<ToDo:0x0000000001c1b1e0 @title="Take out recycling", @description="", @done=false>,
+#           #<ToDo:0x0000000001c1a448 @title="Walk Dog", @description="", @done=false>]>
+
+# <=>all 3 todo objects are shown in the array that the instance variable @todos points to in the
+# new ToDoList object returned above
+
+list2.mark_done("Walk Dog")
+p list2.all_not_done # todo4 object is not included in the return value as expected
+#<ToDoList:0x0000000001c196b0 @title="More ToDo's", 
+# @todos=[#<ToDo:0x0000000001c1b1e0 @title="Take out recycling", @description="", @done=false>, 
+#         #<ToDo:0x0000000001c1a448 @title="Walk Dog", @description="", @done=false>]>
+
+p list2.find_by_title("Lift")
+# => nil
+p list2.find_by_title("Take out recycling")
+# does return only the ToDo object w/ the "Take out recycling" title
