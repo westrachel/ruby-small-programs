@@ -110,6 +110,8 @@ class ToDoList
     self.to_s
   end
 
+  alias_method :<<, :add
+
   def size
     todos.size
   end
@@ -219,15 +221,11 @@ class ToDoList
   end
 
   def to_s
-    puts "---- Today's Todos ----"
-    if current_list.empty?
-      puts "Everything is complete!"
-    else
-      msg = <<~TEXT.chomp
-      #{puts current_list.join("\n")}
-      TEXT
-      msg
-    end
+    msg_pt1 = "---- #{title} ----\n"
+    msg_pt2 = <<~TEXT.chomp
+      #{current_list.join("\n")}
+    TEXT
+    msg_pt1 + msg_pt2
   end
 end
 
@@ -341,7 +339,6 @@ p list.remove_at(0)             # removes and returns the 1st item
 # ---- Outputting the list -----
 list.to_s                      # returns string representation of the list
 #---- Today's Todos ----
-#Everything is complete!
 
 # Check that custom ToDoList#each method works as intended
 todo4 = ToDo.new("Walk Dog")
