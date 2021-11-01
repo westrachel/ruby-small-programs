@@ -30,9 +30,9 @@
 #     > test that this method adds a ToDo object like add
 #     >
 
+require 'simplecov'
 require 'minitest/autorun'
 require "minitest/reporters"
-require 'simplecov'
 SimpleCov.start
 
 Minitest::Reporters.use!
