@@ -30,4 +30,12 @@ class CashRegisterTest < MiniTest::Test
       register2.give_receipt(transaction2)
     end
   end
+
+  def test_prompt_for_payment
+    transaction3 = Transaction.new(45)
+    input = StringIO.new('50\n')
+    output = StringIO.new
+    transaction3.prompt_for_payment(input: input, output: output)
+    assert_equal(5, CashRegister.new(100).change(transaction3))
+  end
 end
