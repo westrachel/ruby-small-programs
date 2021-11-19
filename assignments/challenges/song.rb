@@ -42,49 +42,57 @@ end
 p multiple_arguments(99, 0) # => returns array whose first element == 99 and that contains integers incrementing
 #   downwards to 0 as intended
 p multiple_arguments(5) # => [5]    <=> confirms that method can handle when only 1 argument is passed in
-      
-class BeerSong
-  def self.verse(num)
-    repeated_verse(num)
+
+class Lyrics
+  attr_reader :number
+
+  def initialize(number)
+    @number = number
   end
 
-  def self.verses(*nums)
-    nums[1].upto(nums[0]).to_a.reverse.each_with_object([]) do |num, verses_arr|
-      verses_arr << repeated_verse(num)
-    end.join("\n")
-  end
-    
-  def self.lyrics
-    self.verse(99, 0)
+  def plural_verse
+    "#{number} bottles of beer on the wall, #{number} bottles of beer.\n" +
+    "Take one down and pass it around, #{number - 1} bottles of beer on the wall.\n"
   end
 
-  private
-  def self.repeated_verse(number)
-    self.plural_verse(number) if number == 2
-    single_verse if number == 1
-    no_more_verse if number == 0
-    plural_verse if number > 2
-  end
-
-  def self.plural_verse(num)
-    "#{num} bottles of beer on the wall, #{num} bottles of beer.\n" +
-    "Take one down and pass it around, #{num - 1} bottles of beer on the wall.\n"
-  end
-
-  def self.double_verse
+  def double_verse
     "2 bottles of beer on the wall, 2 bottles of beer.\n" + 
     "Take one down and pass it around, 1 bottle of beer on the wall.\n"
   end
 
-  def self.single_verse
+  def single_verse
     "1 bottle of beer on the wall, 1 bottle of beer.\n" +
     "Take it down and pass it around, no more bottles of beer on the wall.\n"
   end
 
-  def self.no_more_verse
+  def no_more_verse
     "No more bottles of beer on the wall, no more bottles of beer.\n" + 
-    "Go to the store and buy some more, 99 bottles of beer on the wall."
+     "Go to the store and buy some more, 99 bottles of beer on the wall.\n"
   end
+
+  def find_verse
+    case number
+    when 2 then double_verse
+    when 1 then single_verse
+    when 0 then no_more_verse
+    else plural_verse
+    end
+  end
+  
 end
 
-p BeerSong.verse(5)
+class BeerSong
+  def self.verse(num)
+    Lyrics.new(num).find_verse
+  end
+
+  def self.verses(*nums)
+    nums[1].upto(nums[0]).to_a.reverse.each_with_object([]) do |num, verses_arr|
+      verses_arr << Lyrics.new(num).find_verse
+    end.join("\n")
+  end
+    
+  def self.lyrics
+    self.verses(99, 0)
+  end
+end
