@@ -20,6 +20,16 @@
 #       rate number to decimal and the epsilon rate to decimal and then
 #       multiplying these values together
 
+# Binary Sequence to Decimal Conversion:
+# > multiply each binary digit (0 or 1) by 2 raised to the power of the
+#    binary digit's place in the sequence and then sum the results
+# example:
+#     01001 = 0*2^4 + 1*2^3 + 0*2^2 + 0*2^1 + 1*2^0
+# > can use times method to iterate over a dynamic binary string sequence
+#    > the "0" or "1" string element at the zeroth index should be
+#       multiplied by 2^(dynamic_value) where dynamic_value will always
+#       be 4 for the zeroth index since the binary sequence is 5 digits
+
 class Diagnostics
   attr_reader :counts_at_each_position
   NUM_TO_POSITION = { 0 => :position1,
@@ -44,7 +54,7 @@ class Diagnostics
       max_value_pair = value_hash.select { |k, v| v == value_hash.values.max }
       gamma_rate_string << max_value_pair.keys[0]
     end
-    gamma_rate_string
+    convert_binary_to_decimal(gamma_rate_string)
   end
 
   def epsilon_rate
@@ -54,7 +64,7 @@ class Diagnostics
       min_value_pair = value_hash.select { |k, v| v == value_hash.values.min }
       epsilon_rate_string << min_value_pair.keys[0]
     end
-    epsilon_rate_string
+    convert_binary_to_decimal(epsilon_rate_string)
   end
 
   def find_counts_at_each_position
@@ -69,6 +79,20 @@ class Diagnostics
 
   def scrub_report
     @report.split(/\s/)
+  end
+
+  def convert_binary_to_decimal(string)
+    decimal_value = 0
+    power = 4
+    string.size.times do |index|
+      decimal_value += (string[index].to_i * 2 ** power)
+      power -= 1
+    end
+    decimal_value
+  end
+
+  def power_consumption
+    self.epsilon_rate * self.gamma_rate
   end
   
 end
@@ -90,4 +114,10 @@ MSG
 
 report1 = Diagnostics.new(sample_report)
 
-p report1.gamma_rate
+# check work:
+p report1.epsilon_rate == 9
+# => true
+p report1.gamma_rate == 22
+# => true
+p report1.power_consumption == 198
+# => true
