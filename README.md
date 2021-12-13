@@ -1,7 +1,10 @@
 #README#
+
+
 Exercises + Application Assignments from Ruby Object Oriented Programming course 130
 
 Core Concepts of 130:
+
 i. Closures are chunks of code that can be saved, passed around, and executed later
 
 ii. Closures maintain access to the variables, methods, and other artifacts initialized
