@@ -1,0 +1,17 @@
+<h2><%= @username %></h2>
+<p><strong>Email:  </strong><%= @user_profile[:email] %></p>
+
+<p><strong>Interests: </strong><%= @user_profile[:interests].join(', ') %></p>
+
+<p><strong>Other Users:</strong>
+  <% @other_users.each_with_index do |name, index| %>
+    <a href="/users/<%= name %>">
+      <% if index == (@other_users.size - 1) %>
+        <%= name.to_s %>
+      <% else %>
+        <%= name.to_s %>,
+      <% end %>
+    </a>
+  <% end %>
+</p>
+
