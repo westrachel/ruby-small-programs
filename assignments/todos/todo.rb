@@ -34,6 +34,12 @@ end
 
 # create a new list
 post "/lists" do
-  session[:lists] << {name: params[:list_name], todos: []}
-  redirect "/lists"
+  list_name = params[:list_name]
+  if list_name.size >= 2 && list_name.size <= 100
+    session[:lists] << {name: params[:list_name], todos: []}
+    session[:success] = "This list has been created."
+    redirect "/lists"
+  else
+    erb :new_list, layout: :layout
+  end
 end
