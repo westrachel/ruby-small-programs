@@ -1,0 +1,14 @@
+<form action="/lists/<%= params[:id] %>" method="post">
+  <dl>
+    <dt>
+      <label for="list_name">Revise name of the list </label>
+    </dt>
+    <dd>
+      <input name="list_name" placeholder="List Name" type="text" value="<%= @list[:name].capitalize %>">
+    </dd>
+  </dl>
+  <fieldset class="actions">
+    <input type="submit" value="Save">
+    <a href="/lists/<%= params[:id] %>">Cancel</a>
+  </fieldset>
+</form>

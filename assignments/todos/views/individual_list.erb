@@ -1,0 +1,23 @@
+<section id="todos">
+  <header>
+    <h3><%= @selected_list[:name].capitalize %> </h3>
+    <ul>
+      <li><a class="edit" href="/lists/<%= @list_index %>/edit">Edit List</a></li>
+    </ul>
+  </header>
+</section>
+
+<% content_for :header_links do %>
+  <a href="/lists">All Lists</a>
+<% end %>
+  
+<ul>
+  <% @selected_list[:todos].each do |todo| %>
+    <li>
+      <p><%= todo %></p>
+    </li>
+  <% end %>
+</ul>
+
+
+
