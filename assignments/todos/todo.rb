@@ -62,25 +62,36 @@ get "/lists/new" do
   erb :new_list, layout: :layout
 end
 
+def find_list(id)
+  largest_active_list_id = session[:lists].size - 1
+
+  if largest_active_list_id < id
+    session[:error] = "The specified list was not found."
+    redirect "/lists"
+  else
+    return session[:lists][id]
+  end
+end
+
 # view individual list
 get "/lists/:id" do
   @list_id = params[:id].to_i
-  @list = session[:lists][@list_id]
 
+  @list = find_list(@list_id)
   erb :individual_list, layout: :layout
 end
 
 # Retrieve page to edit existing list
 get "/lists/:id/edit" do
   @list_id = params[:id].to_i
-  @list = session[:lists][@list_id]
+  @list = find_list(@list_id)
   erb :edit_list, layout: :layout
 end
 
 # allow user to revise an existing list
 post "/lists/:id" do
   @list_id = params[:id].to_i
-  @list = session[:lists][@list_id]
+  @list = find_list(@list_id)
   @list_name = params[:revised_list_name].strip
   
   error = list_name_as_error(@list_name)
@@ -136,7 +147,7 @@ end
 # add todo items to a list
 post "/lists/:list_id/todos" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = find_list(@list_id)
   todo_input = params[:todo].strip
   
   error = todo_as_error(todo_input)
@@ -153,7 +164,7 @@ end
 # delete a todo item from a list
 post "/lists/:list_id/todos/:todo_id/delete" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = find_list(@list_id)
   @todo_id = params[:todo_id].to_i
   
   @list[:todos].delete_at(@todo_id)
@@ -163,7 +174,7 @@ end
 # update a todo item as completed or not completed
 post "/lists/:list_id/todos/:todo_id" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = find_list(@list_id)
   @todo_id = params[:todo_id].to_i
   
   is_complete_boolean = params[:completed] == "true"
@@ -175,7 +186,7 @@ end
 # complete all todo items at once for an individual list
 post "/lists/:id/complete_all" do
   @list_id = params[:id].to_i
-  @list = session[:lists][@list_id]
+  @list = find_list(@list_id)
   
   @list[:todos].each do |todo|
     todo[:completed] = true
