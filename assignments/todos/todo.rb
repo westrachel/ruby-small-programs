@@ -11,36 +11,44 @@ end
 
 helpers do
   def list_complete?(list)
-    total_todos(list) > 0 && count_incomplete_todos(list) == 0
+    todos_count(list) > 0 && count_incomplete_todos(list) == 0
   end
 
   def list_class(list)
     "complete" if list_complete?(list)
   end
+
+  def todos_count(list)
+    list[:todos].size
+  end
   
   def count_incomplete_todos(list)
-    list[:todos].select { |todo| todo[:completed] == false }.size
-  end
-
-  def total_todos(list)
-    list[:todos].size
+    list[:todos].count { |todo| todo[:completed] == false }
   end
 
   def sort_lists(lists, &block)
     complete_lists, incomplete_lists = lists.partition { |list| list_complete?(list) }
 
-    incomplete_lists.each { |list| yield list, lists.index(list) }
-    complete_lists.each { |list| yield list, lists.index(list) }
+    incomplete_lists.each(&block)
+    complete_lists.each(&block)
     
   end
 
   def sort_todos(todos_list, &block)
     complete_todos, incomplete_todos = todos_list.partition { |todo| todo[:completed] }
 
-    incomplete_todos.each { |todo| yield todo, todos_list.index(todo) }
-    complete_todos.each { |todo| yield todo, todos_list.index(todo) }
+    incomplete_todos.each(&block)
+    complete_todos.each(&block)
   end
 
+  def all_ids(list)
+    list.map { |element| element[:id] }
+  end
+
+  def next_available_id(list)
+    current_ids = all_ids(list)
+    current_ids.empty? ? 0 : (current_ids.max + 1)
+  end
 end
 
 before do
@@ -63,13 +71,11 @@ get "/lists/new" do
 end
 
 def find_list(id)
-  largest_active_list_id = session[:lists].size - 1
-
-  if largest_active_list_id < id
+  if all_ids(session[:lists]).include?(id) == false
     session[:error] = "The specified list was not found."
     redirect "/lists"
   else
-    return session[:lists][id]
+    return session[:lists].select { |list| list[:id] == id }[0]
   end
 end
 
@@ -123,7 +129,9 @@ post "/lists" do
     session[:error] = error
     erb :new_list, layout: :layout
   else
-    session[:lists] << {name: @list_name, todos: []}
+    id = next_available_id(session[:lists])
+    session[:lists] << {id: id, name: @list_name, todos: []}
+
     session[:success] = "The list has been created."
     redirect "/lists"
   end
@@ -133,7 +141,8 @@ end
 post "/lists/:id/delete" do
   @list_id = params[:id].to_i
   @list_name = session[:lists][@list_id][:name]
-  session[:lists].delete_at(@list_id)
+
+  session[:lists].reject! { |list| list[:id] == @list_id }
 
   if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
     "/lists"
@@ -160,7 +169,10 @@ post "/lists/:list_id/todos" do
     session[:error] = error
     erb :edit_list, layout: :layout
   else
-    @list[:todos] << {name: params[:todo], completed: false}
+
+    id = next_available_id(@list[:todos])
+    @list[:todos] << { id: id, name: params[:todo], completed: false}
+
     session[:success] = "The todo was added."
     redirect "/lists/#{@list_id}"
   end
@@ -172,7 +184,7 @@ post "/lists/:list_id/todos/:todo_id/delete" do
   @list = find_list(@list_id)
   @todo_id = params[:todo_id].to_i
   
-  @list[:todos].delete_at(@todo_id)
+  @list[:todos].reject! { |todo| todo[:id] == @todo_id }
   
   if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
     status 204 
@@ -189,7 +201,9 @@ post "/lists/:list_id/todos/:todo_id" do
   @todo_id = params[:todo_id].to_i
   
   is_complete_boolean = params[:completed] == "true"
-  @list[:todos][@todo_id][:completed] = is_complete_boolean
+  todo = @list[:todos].find { |todo| todo[:id] == @todo_id }
+  todo[:completed] = is_complete_boolean
+
   session[:success] = "The todo has been updated."
   redirect "/lists/#{@list_id}"
 end
