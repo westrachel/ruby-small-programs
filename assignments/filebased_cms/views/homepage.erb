@@ -1,3 +1,7 @@
+<% if session[:error] %>
+  <p><%= session.delete(:error) %></p>
+<% end %>
+
 <ul><% @scrubbed_list_of_files.each do |filename| %>
   <li>
     <a href="/<%= filename %>"><%= filename %></a>
