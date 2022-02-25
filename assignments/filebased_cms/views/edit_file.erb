@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <body>
+    <h4>Edit the content of <%= @filename %>:</h4>
+    <textarea name="new_file_content" placeholder="<%= @file_content %>" form="EditFile">
+      <%= @file_content %>
+    </textarea>
+
+    <form action="/<%= @filename %>" method="post" id="EditFile">
+      <input type="submit" value="Save Changes">
+      <a href="/">Cancel</a>
+    </form>
+  </body>
+</html>
