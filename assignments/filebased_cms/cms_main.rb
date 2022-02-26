@@ -14,6 +14,14 @@ def render_markdown(text)
   markdown.render(text)
 end
 
+def data_path
+  if ENV["RACK_ENV"] == "test"
+    File.expand_path("test/data", __FILE__)
+  else
+    File.expand_path("data/", __FILE__)
+  end
+end
+
 def file_content(location)
   content = File.read(location)
   case File.extname(location)
@@ -33,29 +41,39 @@ get "/" do
 end
 
 get "/:filename" do
-  if File.exist?("data/#{params[:filename]}")
-    file_content("data/#{params[:filename]}")
+  file_path = File.join(data_path, params[:filename])
+
+  #if File.exist?("data/#{params[:filename]}")
+  #  file_content("data/#{params[:filename]}")
+  if File.exist?(file_path)
+    file_content(file_path)
   else
-    session[:error] = "#{params[:filename]} does not exist."
+    session[:msg] = "#{params[:filename]} does not exist."
     redirect "/"
   end
 end
 
 get "/:filename/edit" do
-  if File.exist?("data/#{params[:filename]}")
-    @filename = params[:filename]
-    @file_content = File.read("data/#{@filename}")
+  #if File.exist?("data/#{params[:filename]}")
+  #  @filename = params[:filename]
+
+  file_path = File.join(data_path, params[:filename])
+
+  if File.exist?(file_path)
+    file_content(file_path)
+    @file_content = File.read(file_path)
     erb :edit_file
   else
-    session[:error] = "#{params[:filename]} does not exist, so edits cannot occur."
+    session[:msg] = "#{params[:filename]} does not exist, so edits cannot occur."
     redirect "/"
   end
 end
 
 post "/:filename" do
-  @filename = params[:filename]
-  File.open("data/#{params[:filename]}", 'r+') { |file| file.puts session[:new_file_content] }
+  file_path = File.join(data_path, params[:filename])
+  File.write(file_path, params[:content])
+  #File.write("data/#{params[:filename]}", params[:new_file_content])
 
-  session[:success] = "#{@filename} has been updated."
-  redirect "/#{@filename } "
+  session[:msg] = "#{params[:filename]} has been updated."
+  redirect "/"
 end
