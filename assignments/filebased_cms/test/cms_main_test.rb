@@ -21,12 +21,6 @@ class FileBasedCMSTest < Minitest::Test
     FileUtils.rm_rf(data_path)
   end
 
-  def create_file(name, content="")
-    File.open(File.join(data_path, name), "w") do |file|
-      file.write(content)
-    end
-  end
-
   def test_homepage
     create_file "history.txt"
     create_file "changes.txt"
@@ -77,7 +71,7 @@ class FileBasedCMSTest < Minitest::Test
   end
 
   def test_edit_file
-    create_document "about.md"
+    create_file "about.md"
 
     get "/about.md/edit"
 
@@ -97,5 +91,29 @@ class FileBasedCMSTest < Minitest::Test
     get "/changes.txt"
     assert_equal 200, last_response.status
     assert_includes last_response.body, "All files can be edited!"
+  end
+
+  def test_make_new_file_with_blank_name
+    post "/new", new_file: ""
+    assert_includes last_response.body, "A name is required to create a new file."
+  end
+
+  def test_make_new_files
+    post "/new", new_file: "hello_world"
+    assert_equal 302, last_response.status
+
+    get last_response["location"]
+    assert_includes last_response.body, "hello_world.txt was created."
+  end
+
+  def test_deleting_a_file
+    post "/new", new_file: "test.txt"
+
+    post "/test.txt/delete"
+    get last_response["location"]
+    assert_includes last_response.body, "test.txt was deleted."
+
+    get "/"
+    refute_includes last_response.body, "test.txt"
   end
 end

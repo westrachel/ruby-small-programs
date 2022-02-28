@@ -1,0 +1,13 @@
+body {
+  font-family: sans-serif;
+  padding: 1em;
+}
+
+.temp_message {
+  background: #FFFF00;
+  padding: 15px;
+}
+
+form.inline {
+  display: inline;
+}

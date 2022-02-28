@@ -1,17 +1,15 @@
-<!doctype html>
-<html>
-  <body>
-    <% if session[:msg] %>
-      <p><%= session.delete(:msg) %></p>
-    <% end %>
+<ul><% @scrubbed_list_of_files.each do |filename| %>
+  <li>
+    <a href="/<%= filename %>"><%= filename %></a>
+    <a href="/<%= filename %>/edit">Edit</a>
+    <form class="inline" action="/<%= filename %>/delete" method="post">
+      <button type="submit">Delete</button>
+    </form>
+  </li>
+<% end %>
+</ul>
 
-    <ul><% @scrubbed_list_of_files.each do |filename| %>
-      <li>
-        <a href="/<%= filename %>"><%= filename %></a>
-        <a href="/<%= filename %>/edit">Edit</a>
-      </li>
-    <% end %>
-    </ul>
+<p>
+  <a href="/new">New File</a>
+</p>
 
-  </body>
-</html>
