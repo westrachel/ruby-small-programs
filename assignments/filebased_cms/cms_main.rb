@@ -47,6 +47,17 @@ def ensure_extension(filename)
   File.extname(filename) == "" ? (filename + ".txt") : filename
 end
 
+def logged_in?
+  session[:username] == "user1"
+end
+
+def logged_out_redirect_display(msg)
+  if logged_in? == false
+    session[:msg] = msg
+    redirect "/"
+  end
+end
+
 get "/" do
   @scrubbed_list_of_files = Dir.entries("data").select do |filename|
     [".", ".."].include?(filename) == false
@@ -55,10 +66,14 @@ get "/" do
 end
 
 get "/new" do
+  logged_out_redirect_display("You must be logged in to create a new file.")
+  
   erb :new_file
 end
 
 post "/new" do
+  logged_out_redirect_display("You must be logged in to create a new file.")
+
   @new_filename = params[:new_file]
   
   if blank_filename?(@new_filename)
@@ -85,6 +100,8 @@ get "/:filename" do
 end
 
 get "/:filename/edit" do
+  logged_out_redirect_display("You must be logged in to edit a file.")
+  
   @filename = params[:filename]
   file_path = File.join(data_path, @filename)
   
@@ -93,6 +110,8 @@ get "/:filename/edit" do
 end
 
 post "/:filename" do
+  logged_out_redirect_display("You must be logged in to create a file.")
+
   file_path = File.join(data_path, params[:filename])
   File.write(file_path, params[:new_file_content])
 
@@ -101,6 +120,8 @@ post "/:filename" do
 end
 
 post "/:filename/delete" do
+  logged_out_redirect_display("You must be logged in to delete a file.")
+
   file_path = File.join(data_path, params[:filename])
   File.delete(file_path)
   

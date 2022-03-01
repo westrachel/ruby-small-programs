@@ -1,1 +1,2 @@
-All documents can be edited!
+All documents are editable!
+      

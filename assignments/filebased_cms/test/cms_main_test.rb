@@ -25,6 +25,10 @@ class FileBasedCMSTest < Minitest::Test
     last_request.env["rack.session"]
   end
 
+  def logged_in_session
+    { "rack.session" => { username: "user1", password: "notsosecret"} }
+  end
+
   def test_homepage
     create_file "history.txt"
     create_file "changes.txt"
@@ -66,7 +70,7 @@ class FileBasedCMSTest < Minitest::Test
   def test_edit_file
     create_file "about.md"
 
-    get "/about.md/edit"
+    get "/about.md/edit", {}, logged_in_session
 
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<form"
@@ -75,6 +79,7 @@ class FileBasedCMSTest < Minitest::Test
   end
   
   def test_saving_file_edits
+    get "/new", {}, logged_in_session
     post "/changes.txt", new_file_content: "All files can be edited!"
     assert_equal 302, last_response.status
     assert_equal "changes.txt has been updated.", session[:msg]
@@ -84,12 +89,18 @@ class FileBasedCMSTest < Minitest::Test
     assert_includes last_response.body, "All files can be edited!"
   end
 
+  def logged_in_session
+    { "rack.session" => { username: "user1", password: "notsosecret"} }
+  end
+
   def test_make_new_file_with_blank_name
+    get "/new", {}, logged_in_session
     post "/new", new_file: ""
     assert_includes last_response.body, "A name is required to create a new file."
   end
 
   def test_make_new_files
+    get "/new", {}, logged_in_session
     post "/new", new_file: "hello_world"
     assert_equal 302, last_response.status
     assert_equal "hello_world.txt was created.", session[:msg]
@@ -99,6 +110,7 @@ class FileBasedCMSTest < Minitest::Test
   end
 
   def test_deleting_a_file
+    get "/new", {}, logged_in_session
     post "/new", new_file: "test.txt"
 
     post "/test.txt/delete"
@@ -126,4 +138,21 @@ class FileBasedCMSTest < Minitest::Test
     assert_includes last_response.body, "Login"
   end
 
+  def test_actions_unsuccessful_while_signed_out
+    get "/new"
+    assert_includes "You must be logged in to create a new file.", session[:msg]
+    
+    get "/new", {}, logged_in_session
+    post "/new_file.ext", new_file_content: ""
+    post "users/logout"
+    
+    get "/new_file.ext/edit"
+    # user should be redirected to homepage that lists out new_file.ext and has temporary session message
+    assert_includes "You must be logged in to edit a file.", session[:msg]
+    get last_response["location"]
+    assert_includes last_response.body, "new_file.ext"
+    
+    post "/new_file.ext/delete"
+    assert_includes "You must be logged in to delete a file.", session[:msg]
+  end
 end
