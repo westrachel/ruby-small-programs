@@ -21,6 +21,10 @@ class FileBasedCMSTest < Minitest::Test
     FileUtils.rm_rf(data_path)
   end
 
+  def session
+    last_request.env["rack.session"]
+  end
+
   def test_homepage
     create_file "history.txt"
     create_file "changes.txt"
@@ -55,19 +59,8 @@ class FileBasedCMSTest < Minitest::Test
 
   def test_nonexistent_pg
     get "/nonexistent_page.txt"
-
-    # user should be redirected when attempting to access nonexistent file
     assert_equal 302, last_response.status
-
-    # get the page user was redirected to
-    get last_response["Location"]
-
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "nonexistent_page.txt does not exist."
-
-    # verify that after refreshing the homepage that the error message disappears
-    get "/"
-    refute_includes last_response.body, "nonexistent_page.txt does not exist."
+    assert_equal "nonexistent_page.txt does not exist.", session[:msg]
   end
 
   def test_edit_file
@@ -84,10 +77,8 @@ class FileBasedCMSTest < Minitest::Test
   def test_saving_file_edits
     post "/changes.txt", new_file_content: "All files can be edited!"
     assert_equal 302, last_response.status
+    assert_equal "changes.txt has been updated.", session[:msg]
 
-    get last_response["location"]
-
-    assert_includes last_response.body, "changes.txt has been updated."
     get "/changes.txt"
     assert_equal 200, last_response.status
     assert_includes last_response.body, "All files can be edited!"
@@ -101,19 +92,38 @@ class FileBasedCMSTest < Minitest::Test
   def test_make_new_files
     post "/new", new_file: "hello_world"
     assert_equal 302, last_response.status
+    assert_equal "hello_world.txt was created.", session[:msg]
 
-    get last_response["location"]
-    assert_includes last_response.body, "hello_world.txt was created."
+    get "/"
+    assert_includes last_response.body, "hello_world.txt"
   end
 
   def test_deleting_a_file
     post "/new", new_file: "test.txt"
 
     post "/test.txt/delete"
-    get last_response["location"]
-    assert_includes last_response.body, "test.txt was deleted."
+    assert_includes "test.txt was deleted.", session[:msg]
 
     get "/"
-    refute_includes last_response.body, "test.txt"
+    refute_includes last_response.body, %q(href="/test.txt")
   end
+
+  def test_incorrect_login
+    post "/users/login", username: "user2", password: ""
+    assert_equal 422, last_response.status
+    assert_nil session[:username]
+    assert_includes last_response.body, "Username or password was incorrect. Please try again."
+  end
+
+  def test_succesful_login_logout
+    post "/users/login", username: "user1", password: "notsosecret"
+    assert_equal 302, last_response.status
+    assert_equal "Welcome, user1", session[:msg]
+
+    post "users/logout"
+    get last_response["location"]
+    assert_includes last_response.body, "You have successfully logged out."
+    assert_includes last_response.body, "Login"
+  end
+
 end

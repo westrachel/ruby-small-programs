@@ -107,3 +107,25 @@ post "/:filename/delete" do
   session[:msg] = "#{params[:filename]} was deleted."
   redirect "/"
 end
+
+get "/users/login" do
+  erb :login
+end
+
+post "/users/login" do
+  if params[:username] == "user1" && params[:password] == "notsosecret"
+    session[:username] = params[:username]
+    session[:msg] = "Welcome, #{session[:username]}"
+    redirect "/"
+  else
+    session[:msg] = "Username or password was incorrect. Please try again."
+    status 422
+    erb :login
+  end
+end
+
+post "/users/logout" do
+  session.delete(:username)
+  session[:msg] = "You have successfully logged out."
+  redirect "/"
+end

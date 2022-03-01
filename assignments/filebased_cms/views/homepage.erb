@@ -13,3 +13,13 @@
   <a href="/new">New File</a>
 </p>
 
+<% if session[:username] %>
+  <form action="/users/logout" method="post">
+    <p class="login-status">
+      Signed in as <%= session[:username] %>.
+      <button type="submit">Logout</button>
+    </p>
+  </form>
+<% else %>
+  <p class="login-status"></p><a href="/users/login">Login</a>
+<% end %>
