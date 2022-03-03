@@ -3,7 +3,8 @@ require "sinatra/reloader"
 require "sinatra/content_for"
 require "tilt/erubis"
 require "redcarpet"
-require 'yaml'
+require "yaml"
+require "bcrypt"
 
 configure do
   enable :sessions
@@ -25,6 +26,13 @@ def all_users_info
                          File.expand_path("../data/users.yml", __FILE__)
                        end
   YAML.load_file(user_info_location)
+end
+
+def valid_user_info?(username, password)
+  if all_users_info.key?(username)
+    bcrypt_password = BCrypt::Password.new(all_users_info[username])
+    bcrypt_password == password
+  end
 end
 
 def create_file(name, content="")
@@ -144,10 +152,9 @@ get "/users/login" do
 end
 
 post "/users/login" do
-  user_info = all_users_info
   username = params[:username]
 
-  if user_info[username] == params[:password]
+  if valid_user_info?(username, params[:password])
     session[:username] = username
     session[:msg] = "Welcome, #{username}"
     redirect "/"
