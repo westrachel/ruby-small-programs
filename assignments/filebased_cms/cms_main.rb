@@ -3,6 +3,7 @@ require "sinatra/reloader"
 require "sinatra/content_for"
 require "tilt/erubis"
 require "redcarpet"
+require 'yaml'
 
 configure do
   enable :sessions
@@ -15,6 +16,15 @@ def data_path
   else
     File.expand_path("../data/", __FILE__)
   end
+end
+
+def all_users_info
+  user_info_location = if ENV["RACK_ENV"] == "test"
+                         File.expand_path("../test/users.yml", __FILE__)
+                       else
+                         File.expand_path("../data/users.yml", __FILE__)
+                       end
+  YAML.load_file(user_info_location)
 end
 
 def create_file(name, content="")
@@ -134,9 +144,12 @@ get "/users/login" do
 end
 
 post "/users/login" do
-  if params[:username] == "user1" && params[:password] == "notsosecret"
-    session[:username] = params[:username]
-    session[:msg] = "Welcome, #{session[:username]}"
+  user_info = all_users_info
+  username = params[:username]
+
+  if user_info[username] == params[:password]
+    session[:username] = username
+    session[:msg] = "Welcome, #{username}"
     redirect "/"
   else
     session[:msg] = "Username or password was incorrect. Please try again."
