@@ -120,6 +120,21 @@ class FileBasedCMSTest < Minitest::Test
     refute_includes last_response.body, %q(href="/test.txt")
   end
 
+  def test_duplicating_and_renaming_file
+    get "/new", {}, logged_in_session
+    post "/new", new_file: "test.txt"
+
+    post "/test.txt/duplicate"
+    get last_response["location"]
+    assert_includes last_response.body, %q(href="/test_copy.txt")
+
+    post "/test_copy.txt/rename", new_filename: "answer.txt"
+    assert_includes "test_copy.txt was renamed to: answer.txt.", session[:msg]
+
+    get "/"
+    assert_includes last_response.body, %q(href="/answer.txt")
+  end
+
   def test_incorrect_login
     post "/users/login", username: "user2", password: ""
     assert_equal 422, last_response.status
@@ -151,6 +166,9 @@ class FileBasedCMSTest < Minitest::Test
     assert_includes "You must be logged in to edit a file.", session[:msg]
     get last_response["location"]
     assert_includes last_response.body, "new_file.ext"
+
+    post "/new_file.ext/duplicate"
+    assert_includes "You must be logged in to duplicate a file.", session[:msg]
     
     post "/new_file.ext/delete"
     assert_includes "You must be logged in to delete a file.", session[:msg]

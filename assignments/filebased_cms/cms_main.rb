@@ -54,6 +54,7 @@ def file_content(location)
   when ".txt"
     headers["Content-Type"] = "text/plain"
     content
+  when ""
   end
 end
 
@@ -66,7 +67,7 @@ def ensure_extension(filename)
 end
 
 def logged_in?
-  session[:username] == "user1"
+  all_users_info.include?(session[:username])
 end
 
 def logged_out_redirect_display(msg)
@@ -97,6 +98,9 @@ post "/new" do
   if blank_filename?(@new_filename)
     session[:msg] = "A name is required to create a new file."
     erb :new_file
+  elsif File.exist?(File.join(data_path, @new_filename))
+    session[:msg] = "A unique name is required to create a new file."
+    erb :new_file
   else
     @filename = ensure_extension(@new_filename)
     
@@ -107,7 +111,7 @@ post "/new" do
 end
 
 get "/:filename" do
-  file_path = File.join(data_path, params[:filename])
+  file_path = File.join(data_path, File.basename(params[:filename]))
 
   if File.exist?(file_path)
     file_content(file_path)
@@ -144,6 +148,44 @@ post "/:filename/delete" do
   File.delete(file_path)
   
   session[:msg] = "#{params[:filename]} was deleted."
+  redirect "/"
+end
+
+post "/:filename/duplicate" do
+  logged_out_redirect_display("You must be logged in to duplicate a file.")
+
+  file_path = File.join(data_path, params[:filename])
+  content = file_content(file_path)
+  file_ext = File.extname(params[:filename])
+
+  dups_filename = params[:filename].gsub(file_ext, "") + "_copy" + file_ext
+  dups_file_path = File.join(data_path, dups_filename)
+  File.write(dups_file_path, content)
+
+  session[:msg] = "A copy of #{params[:filename]} was created."
+  redirect "/"
+end
+
+get "/:filename/rename" do
+  logged_out_redirect_display("You must be logged in to rename a file.")
+  
+  @filename = params[:filename]
+  file_path = File.join(data_path, @filename)
+  
+  @file_content = File.read(file_path)
+  erb :rename_file
+end
+
+post "/:filename/rename" do
+  current_filename = params[:filename]
+  new_filename = ensure_extension(params[:new_filename])
+  
+  current_file_path = File.join(data_path, current_filename)
+  new_file_path = File.join(data_path, new_filename)
+  
+  File.rename(current_file_path, new_file_path)
+
+  session[:msg] = "#{current_filename} was renamed to: #{new_filename}."
   redirect "/"
 end
 

@@ -5,6 +5,10 @@
     <form class="inline" action="/<%= filename %>/delete" method="post">
       <button type="submit">Delete</button>
     </form>
+    <form class="inline" action="/<%= filename %>/duplicate" method="post">
+      <button type="submit">Duplicate</button>
+    </form>
+    <a href="/<%= filename %>/rename">Rename</a>
   </li>
 <% end %>
 </ul>
