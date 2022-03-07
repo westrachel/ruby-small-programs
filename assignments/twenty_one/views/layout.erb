@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <title>21</title>
+    <link rel="stylesheet" href="/two_one.css" type = "text/css" />
+  </head>
+
+  <body>
+    <% if session[:message] %>
+      <p class ="temp_msg"><%= session.delete(:message) %></p>
+    <% end %>
+    <%= yield %>
+  </body>
+
+</html>

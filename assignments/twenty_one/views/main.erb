@@ -1,0 +1,13 @@
+<h1>Welcome to the game of Twenty One!</h1>
+
+
+<% if session[:username] %>
+  <form action="/users/logout" method="post">
+    <p>
+      Signed in as <%= session[:username] %>.
+      <button type="submit">Logout</button>
+    </p>
+  </form>
+<% else %>
+  <a href="/users/login">Login</a>
+<% end %>
