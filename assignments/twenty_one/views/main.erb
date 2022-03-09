@@ -1,7 +1,7 @@
 <h1>Welcome to the game of Twenty One!</h1>
 
-
 <% if session[:username] %>
+  <p><a href="/new/game">Start New Game of 21</a></p>
   <form action="/users/logout" method="post">
     <p>
       Signed in as <%= session[:username] %>.
@@ -11,3 +11,4 @@
 <% else %>
   <a href="/users/login">Login</a>
 <% end %>
+

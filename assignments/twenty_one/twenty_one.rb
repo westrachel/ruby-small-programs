@@ -51,9 +51,41 @@ class Game
       break if busted?(@players[0])
       dealer_moves
       break if busted?(@players[1])
-      #evaluate_score
+      display_score
     end
     msg_if_bust_found
+  end
+
+  def find_winner
+    x1_score = calc_total(@players[0].hand)
+    x2_score = calc_total(@players[1].hand)
+    if x1_score < x2_score
+      @players[0].name
+    elsif x1_score > x2_score
+      @players[1].name
+    else
+      "tie"
+    end
+  end
+
+  def declare_winner_msg(winner, loser)
+    puts "The final score is:"
+    puts "#{winner.name}: #{calc_total(winner.hand)}"
+    puts "#{loser.name}: #{calc_total(loser.hand)}"
+    puts "#{winner.name} won!"
+  end
+
+  def display_score
+    x1 = @players[0]
+    x2 = @players[1]
+    case find_winner
+    when x1.name
+      declare_winner_msg(x1, x2)
+    when x2.name
+      declare_winner_msg(x2, x1)
+    when "tie"
+      "It was a tie!"
+    end
   end
 
   def opponent_of(current_player)

@@ -11,6 +11,10 @@ configure do
   set :session_secret, 'notanactualsecret'
 end
 
+before do
+  session[:games] ||= []
+end
+
 def all_users_info
   user_info_location = if ENV["RACK_ENV"] == "test"
                          File.expand_path("../test/users.yml", __FILE__)
@@ -42,7 +46,7 @@ get "/" do
   erb :main
 end
 
-get "/twenty_one" do
+get "/new/game" do
   logged_out_redirect_display("You must be logged in to play Twenty One.")
   
   erb :play
