@@ -6,6 +6,7 @@ require "yaml"
 require "bcrypt"
 
 
+
 configure do
   enable :sessions
   set :session_secret, 'notanactualsecret'
@@ -42,12 +43,26 @@ def logged_out_redirect_display(msg)
   end
 end
 
+def all_game_ids(games)
+  games.map { |game| game[:id] }
+end
+
+def next_feasible_game_id(games)
+  current_game_ids = all_game_ids(games)
+  0
+  #current_game_ids.empty? ? 0 : (current_game_ids.max + 1)
+end
+
 get "/" do
   erb :main
 end
 
 get "/new/game" do
   logged_out_redirect_display("You must be logged in to play Twenty One.")
+
+  id = next_feasible_game_id(session[:games])
+  session[:games] << { game_id: id, players: []}
+  session[:message] = "Time to play! Enter hit to draw another card."
   
   erb :play
 end

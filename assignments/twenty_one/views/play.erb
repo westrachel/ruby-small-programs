@@ -1,6 +1,110 @@
-<form class="inline" action="/twenty_one/<%= @game_id %>/hit" method="post">
-  <button type="submit">Hit</button>
-</form>
-<form class="inline" action="/twenty_one/<%= @game_id %>/stay" method="post">
-  <button type="submit">Stay</button>
-</form>
+<table>
+    <thead>
+      <tr>
+        <th colspan="12">Initial cards were dealt! The current hands are:</th>
+      </tr>
+    </thead>
+</table>
+
+
+<div style="float: left;margin-right:100px">
+  <table>
+    <thead>
+      <tr>
+        <th colspan="6">Dealer's Hand:</th>
+      </tr>
+    </thead>
+  </table>
+
+  <table style="border:1px solid;">
+    <tbody>
+      <tr>
+        <td>
+          <img src="/images/heart.png">
+        </td>
+      </tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>
+          <img src="/images/heart.png">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table style="border:1px solid;">
+    <tbody>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+    </tbody>
+  </table>
+</div>
+
+<div style="float: left">
+   <table>
+    <thead>
+      <tr>
+        <th colspan="6">Gamer Hand:</th>
+      </tr>
+    </thead>
+  </table>
+
+  <table style="border:1px solid;">
+    <tbody>
+      <tr>
+        <td>
+          <img src="/images/abstract_club.png">
+        </td>
+      </tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>
+          <img src="/images/abstract_club.png">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table style="border:1px solid;">
+    <tbody>
+      <tr>
+        <td>
+          <img src="/images/spade.png">
+      </tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>
+          <img src="/images/spade.png">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div>
+  <form action="/twenty_one/<%= @game_id %>/hit" method="post">
+    <button type="submit">Hit</button>
+  </form>
+  <form action="/twenty_one/<%= @game_id %>/stay" method="post">
+    <button type="submit">Stay</button>
+  </form>
+</div>
