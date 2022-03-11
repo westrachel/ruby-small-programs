@@ -1,3 +1,5 @@
+<p><%= @deck %></p>
+
 <table>
     <thead>
       <tr>
@@ -11,7 +13,7 @@
   <table>
     <thead>
       <tr>
-        <th colspan="6">Dealer's Hand:</th>
+        <th colspan="6"><%= @game.players[1]).name %>'s Hand:</th>
       </tr>
     </thead>
   </table>
@@ -20,7 +22,7 @@
     <tbody>
       <tr>
         <td>
-          <img src="/images/heart.png">
+          <img src="/images/<%= find_suit(@game.players[1]) %>.png">
         </td>
       </tr>
       <tr></tr>
@@ -31,7 +33,7 @@
         <td></td>
         <td></td>
         <td>
-          <img src="/images/heart.png">
+          <img src="/images/<%= find_suit(@game.players[1]) %>.png">
         </td>
       </tr>
     </tbody>
@@ -49,62 +51,47 @@
   </table>
 </div>
 
-<div style="float: left">
+<div style="float: left;margin-right:100px">
    <table>
     <thead>
       <tr>
-        <th colspan="6">Gamer Hand:</th>
+        <th colspan="6"><%= @game.players[0]).name %>'s Hand:</th>
       </tr>
     </thead>
   </table>
 
+<% @game.players[0].hand.each do |card_array| %>
   <table style="border:1px solid;">
     <tbody>
       <tr>
         <td>
-          <img src="/images/abstract_club.png">
+          <img src="/images/<%= extract_suit(card_array) %>.png">
+        </td>
+      </tr>
+      <tr></tr>
+      <tr>
+        <td>
+          <p><%= card_array[1] %></p>
         </td>
       </tr>
       <tr></tr>
       <tr></tr>
-      <tr></tr>
-      <tr></tr>
       <tr>
         <td></td>
         <td></td>
         <td>
-          <img src="/images/abstract_club.png">
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <table style="border:1px solid;">
-    <tbody>
-      <tr>
-        <td>
-          <img src="/images/spade.png">
-      </tr>
-      <tr></tr>
-      <tr></tr>
-      <tr></tr>
-      <tr></tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td>
-          <img src="/images/spade.png">
+          <img src="/images/<%= extract_suit(card_array) %>.png">
         </td>
       </tr>
     </tbody>
   </table>
-</div>
+<% end %>
 
 <div>
-  <form action="/twenty_one/<%= @game_id %>/hit" method="post">
+  <form action="/game/<%= @game_id %>/hit" method="post">
     <button type="submit">Hit</button>
   </form>
-  <form action="/twenty_one/<%= @game_id %>/stay" method="post">
+  <form action="/game/<%= @game_id %>/stay" method="post">
     <button type="submit">Stay</button>
   </form>
 </div>

@@ -32,6 +32,8 @@ class Participant
 end
 
 class Game
+  attr_accessor :deck
+  attr_reader :player
 
   def initialize(deck, player, dealer)
     @players = [player, dealer]
@@ -196,5 +198,5 @@ class Game
   end
 end
 
-game1 = Game.new(Deck.new, Participant.new("player"), Participant.new("dealer"))
-game1.begin
+#game1 = Game.new(Deck.new, Participant.new("player"), Participant.new("dealer"))
+#game1.begin

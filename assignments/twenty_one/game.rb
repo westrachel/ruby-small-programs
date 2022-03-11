@@ -4,8 +4,7 @@ require "sinatra/content_for"
 require "tilt/erubis"
 require "yaml"
 require "bcrypt"
-
-
+require "./twenty_one.rb"
 
 configure do
   enable :sessions
@@ -23,6 +22,13 @@ def all_users_info
                          File.expand_path("../data/users.yml", __FILE__)
                        end
   YAML.load_file(user_info_location)
+end
+
+helpers do
+  def extract_suit(card)
+    suit = card[0]
+    suit[0..(suit.size - 2)]
+  end
 end
 
 def valid_user_info?(username, password)
@@ -48,9 +54,14 @@ def all_game_ids(games)
 end
 
 def next_feasible_game_id(games)
-  current_game_ids = all_game_ids(games)
-  0
-  #current_game_ids.empty? ? 0 : (current_game_ids.max + 1)
+  games.empty? ? 0 : all_game_ids(games).max + 1
+end
+
+def find_game(games, id_in_scope)
+  arr = games.select do |game|
+    game[:game_id] == id_in_scope
+  end
+  arr[0][:game]
 end
 
 get "/" do
@@ -60,11 +71,36 @@ end
 get "/new/game" do
   logged_out_redirect_display("You must be logged in to play Twenty One.")
 
-  id = next_feasible_game_id(session[:games])
-  session[:games] << { game_id: id, players: []}
-  session[:message] = "Time to play! Enter hit to draw another card."
+  @game_id = next_feasible_game_id(session[:games])
+  session[:games] << { game_id: @game_id, game: Game.new(Deck.new, Participant.new(session[:username]), Participant.new("Dealer"))}
+  @game = find_game(games, @game_id)
+  @game.deal_initial_cards
+  
+  session[:message] = "Time to play! The initial cards dealt are shown below. Enter hit to draw another card."
   
   erb :play
+end
+
+get "/game/:game_id" do
+  logged_out_redirect_display("You must be logged in to view Twenty One games.")
+
+  @game = find_game(session[:games], params[:game_id])
+
+  erb :play
+end
+
+post "/game/:game_id/hit" do
+  @game = find_game(session[:games], params[:game_id])
+  @user = @game.players[0]
+  @user.hit!(@game.deck)
+  @last_card = @game.card_str(@user.hand, (@user.hand.size -1 ))
+  
+  redirect "/game/:game_id"
+end
+
+post "/game/:game_id/stay" do
+  
+  redirect "/game/:game_id"
 end
 
 get "/users/login" do
