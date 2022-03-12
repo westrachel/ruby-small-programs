@@ -12,3 +12,29 @@
   <a href="/users/login">Login</a>
 <% end %>
 
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="12"><h2>All Games</h2></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <% session[:games].each do |game_hash| %>
+          <h3>Game <%= game_hash[:game_id] %>:</h3>
+          <p>
+            <% game_hash[:game].players.each do |plyr| %>
+              <strong><%= plyr.name.capitalize %> :</strong><%= plyr.current_score %>
+            <% end %>
+          </p>
+          <form action="/game/<%= game_hash[:game_id] %>/delete" method="post">
+            <button type="submit">Delete Game</button>
+          </form>
+        <% end %>
+      </td>
+    </tr>
+  </tbody>
+</table>
+

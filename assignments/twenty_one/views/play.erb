@@ -1,19 +1,8 @@
-<p><%= @deck %></p>
-
-<table>
-    <thead>
-      <tr>
-        <th colspan="12">Initial cards were dealt! The current hands are:</th>
-      </tr>
-    </thead>
-</table>
-
-
 <div style="float: left;margin-right:100px">
   <table>
     <thead>
       <tr>
-        <th colspan="6"><%= @game.players[1]).name %>'s Hand:</th>
+        <th colspan="6"><%= @game.players[1].name %>'s Hand:</th>
       </tr>
     </thead>
   </table>
@@ -22,18 +11,22 @@
     <tbody>
       <tr>
         <td>
-          <img src="/images/<%= find_suit(@game.players[1]) %>.png">
+          <img src="/images/<%= extract_suit(players_hand(@game, 1)[0]) %>.png">
         </td>
       </tr>
       <tr></tr>
-      <tr></tr>
+      <tr>
+        <td>
+          <p><%= players_hand(@game, 1)[0][1] %></p>
+        </td>
+      </tr>
       <tr></tr>
       <tr></tr>
       <tr>
         <td></td>
         <td></td>
         <td>
-          <img src="/images/<%= find_suit(@game.players[1]) %>.png">
+          <img src="/images/<%= extract_suit(players_hand(@game, 1)[0]) %>.png">
         </td>
       </tr>
     </tbody>
@@ -55,12 +48,12 @@
    <table>
     <thead>
       <tr>
-        <th colspan="6"><%= @game.players[0]).name %>'s Hand:</th>
+        <th colspan="6"><%= @game.players[0].name.capitalize %>'s Hand:</th>
       </tr>
     </thead>
   </table>
 
-<% @game.players[0].hand.each do |card_array| %>
+<% players_hand(@game, 0).each do |card_array| %>
   <table style="border:1px solid;">
     <tbody>
       <tr>
@@ -70,7 +63,7 @@
       </tr>
       <tr></tr>
       <tr>
-        <td>
+        <td colspan="6">
           <p><%= card_array[1] %></p>
         </td>
       </tr>

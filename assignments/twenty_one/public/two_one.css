@@ -2,3 +2,12 @@
   background: #99CCFF;
   padding: 15px;
 }
+
+td, th {
+    text-align: center; 
+}
+
+#game_score { 
+   float:left;
+   display:inline;
+}

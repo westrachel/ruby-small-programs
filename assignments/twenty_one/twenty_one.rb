@@ -33,7 +33,7 @@ end
 
 class Game
   attr_accessor :deck
-  attr_reader :player
+  attr_reader :players
 
   def initialize(deck, player, dealer)
     @players = [player, dealer]

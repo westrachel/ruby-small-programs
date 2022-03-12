@@ -7,8 +7,9 @@ require "bcrypt"
 require "./twenty_one.rb"
 
 configure do
-  enable :sessions
-  set :session_secret, 'notanactualsecret'
+  use Rack::Session::Cookie, :key => 'rack.session',
+                             :path => '/',
+                             :secret => 'notsosecret'
 end
 
 before do
@@ -28,6 +29,10 @@ helpers do
   def extract_suit(card)
     suit = card[0]
     suit[0..(suit.size - 2)]
+  end
+
+  def players_hand(game, player_index)
+    game.players[player_index].hand
   end
 end
 
@@ -49,12 +54,9 @@ def logged_out_redirect_display(msg)
   end
 end
 
-def all_game_ids(games)
-  games.map { |game| game[:id] }
-end
-
 def next_feasible_game_id(games)
-  games.empty? ? 0 : all_game_ids(games).max + 1
+  current_game_ids = games.map { |game| game[:game_id] }
+  current_game_ids.empty? ? 0 : current_game_ids.max + 1
 end
 
 def find_game(games, id_in_scope)
@@ -62,6 +64,13 @@ def find_game(games, id_in_scope)
     game[:game_id] == id_in_scope
   end
   arr[0][:game]
+end
+
+def find_game_pt2(games, id_in_scope)
+  arr = games.select do |game|
+    game[:game_id] == id_in_scope
+  end
+  arr
 end
 
 get "/" do
@@ -73,7 +82,7 @@ get "/new/game" do
 
   @game_id = next_feasible_game_id(session[:games])
   session[:games] << { game_id: @game_id, game: Game.new(Deck.new, Participant.new(session[:username]), Participant.new("Dealer"))}
-  @game = find_game(games, @game_id)
+  @game = find_game(session[:games], @game_id)
   @game.deal_initial_cards
   
   session[:message] = "Time to play! The initial cards dealt are shown below. Enter hit to draw another card."
@@ -93,7 +102,7 @@ post "/game/:game_id/hit" do
   @game = find_game(session[:games], params[:game_id])
   @user = @game.players[0]
   @user.hit!(@game.deck)
-  @last_card = @game.card_str(@user.hand, (@user.hand.size -1 ))
+  @last_card = @game.card_str(@user.hand, (@user.hand.size - 1 ))
   
   redirect "/game/:game_id"
 end
@@ -113,6 +122,7 @@ post "/users/login" do
   if valid_user_info?(username, params[:password])
     session[:username] = username
     session[:message] = "Welcome, #{username}!"
+    redirect "/"
   else
     session[:message] = "Invalid login credentials."
     status 422
@@ -124,4 +134,17 @@ post "/users/logout" do
   session.delete(:username)
   session[:message] = "Successful logout."
   redirect "/"
+end
+
+post "/game/:game_id/delete" do
+  @game_id = params[:game_id]
+  
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    redirect "/"
+  else
+    session[:games].reject! { |game| game[:game_id] == @game_id }
+    session[:message] = "#{session[:games]}"
+    #session[:message] = "Game #: #{@game_id} was successfully deleted."
+    redirect "/"
+  end
 end
