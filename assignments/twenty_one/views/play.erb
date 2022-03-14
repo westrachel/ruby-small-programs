@@ -1,3 +1,11 @@
+<p>
+  <span>
+    <strong>Current Score:</strong>
+    <%= display_score(@game.players) %>
+  </span>
+</p>
+<br>
+
 <div style="float: left;margin-right:100px">
   <table>
     <thead>
@@ -32,14 +40,18 @@
     </tbody>
   </table>
   
-  <table style="border:1px solid;">
+  <table style="border:1px solid;" id="unknown_card">
     <tbody>
-      <tr></tr>
-      <tr></tr>
-      <tr></tr>
-      <tr></tr>
-      <tr></tr>
-      <tr></tr>
+      <% 3.times do |_| %>
+        <tr>
+          <% 2.times do |_| %>
+            <td>
+              <img src="/images/question_mark.png">
+            </td>
+            <td></td>
+          <% end %>
+        </tr>
+      <% end %>
     </tbody>
   </table>
 </div>
@@ -53,7 +65,7 @@
     </thead>
   </table>
 
-<% players_hand(@game, 0).each do |card_array| %>
+<% ensure_card_order(players_hand(@game, 0)).each do |card_array| %>
   <table style="border:1px solid;">
     <tbody>
       <tr>

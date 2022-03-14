@@ -123,12 +123,12 @@ class Game
   end
 
   def card_str(hand, card_index)
-    "> #{hand[card_index][1]} of #{hand[card_index][0]}"
+    "#{hand[card_index][1]} of #{hand[card_index][0]}"
   end
 
   def dealer_hand_initial_display
     puts "#{@players[1].name} was dealt:"
-    puts card_str(@players[1].hand, 0)
+    puts ">" + card_str(@players[1].hand, 0)
     puts "> unknown card"
     breakline
   end

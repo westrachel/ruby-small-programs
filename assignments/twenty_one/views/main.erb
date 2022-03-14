@@ -16,25 +16,25 @@
 <table>
   <thead>
     <tr>
-      <th colspan="12"><h2>All Games</h2></th>
+      <th colspan="12"><h2>Leaderboard:</h2></th>
+    </tr>
+    <tr>
+      <td>
+        <th colspan="6"><h4>Player</h4></th>
+      </td>
+      <td>
+        <th colspan="6"><h4>Games Won</h4></th>
+      </td>
     </tr>
   </thead>
   <tbody>
+    <% @players.each do |name| %>
     <tr>
-      <td>
-        <% session[:games].each do |game_hash| %>
-          <h3>Game <%= game_hash[:game_id] %>:</h3>
-          <p>
-            <% game_hash[:game].players.each do |plyr| %>
-              <strong><%= plyr.name.capitalize %> :</strong><%= plyr.current_score %>
-            <% end %>
-          </p>
-          <form action="/game/<%= game_hash[:game_id] %>/delete" method="post">
-            <button type="submit">Delete Game</button>
-          </form>
-        <% end %>
+      <td colspan="6">
+        <p><%= name %></p>
       </td>
     </tr>
+    <% end %>
   </tbody>
 </table>
 
