@@ -67,25 +67,29 @@ helpers do
     end
   end
 
+  def separate_face_cards(hand)
+    extract_values(hand).partition { |value| value == value.to_i }
+  end
+
+  def separate_aces(values)
+    values.partition { |value| value == "ace" }
+  end
+
   def score(hand)
-    values = extract_values(hand)
-    total = 0
-    values.each do |value|
-      total += if value == "ace"
-                 total < 12 ? 10 : 1
-               elsif value.to_i == value
-                 value
-               else
-                 Deck::FACE_CARD_VALUES[value]
-               end
+    values = separate_face_cards(hand)
+    num_cards, aces, faces_non_aces = values[0], separate_aces(values[1])[0], separate_aces(values[1])[1]
+    total = num_cards.reduce(0, :+)
+    total += 10 * (faces_non_aces.size)
+    aces.size.times do |_|
+      total += (total > 12 ? 10 : 1)
     end
     total
   end
-  def display_score(players)
+
+  def scores(players)
     scores = players.each_with_object([]) do |plyr, arr|
       arr << "#{plyr.name}: #{score(plyr.hand)}"
     end
-    scores.join(' to ')
   end
 end
 
@@ -143,7 +147,7 @@ get "/new/game" do
   @games << hashify_game_for_storage(@game_id, @game)
   update_gamelog!(@games, datapath)
 
-  session[:message] = "Time to play! The initial cards dealt are shown below. Enter hit to draw another card."
+  session[:message] = "Initial cards were dealt! Current score: #{scores(@game.players)[0]} vs Dealer: ? Enter hit to draw another card."
   
   erb :play
 end
@@ -163,10 +167,15 @@ post "/game/:game_id/hit" do
   @user = @game.players[0]
   @user.hit!(@game.deck.cards)
   @game.find_players_scores
-  @last_card = @game.card_str(@user.hand, (@user.hand.size - 1 ))
-  session[:message] = "You pulled the: #{@last_card}. Your new score is: #{@user.current_score}."
+  @last_card = @game.card_str(@user.hand, -1)
+  session[:message] = "You pulled the: #{@last_card}. Your new score is: #{score(@user.hand)}. #{@user.hand}"
 
   redirect "/game/:game_id"
+end
+
+post "/game/:game_id/dealers_turn" do
+  @game_id = params[:game_id].to_i
+  erb :final_hands
 end
 
 post "/game/:game_id/stay" do

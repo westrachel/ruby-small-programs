@@ -161,17 +161,21 @@ class Game
     end
   end
 
+  def separate_face_cards(hand)
+    extract_values(hand).partition { |value| value == value.to_i }
+  end
+
+  def separate_aces(values)
+    values.partition { |value| value == "ace" }
+  end
+
   def calc_total(hand)
-    values = extract_values(hand)
-    total = 0
-    values.each do |value|
-      total += if value == "ace"
-                 total < 12 ? 10 : 1
-               elsif value.to_i == value
-                 value
-               else
-                 Deck::FACE_CARD_VALUES[value]
-               end
+    values = separate_face_cards(hand)
+    num_cards, aces, faces_non_aces = values[0], separate_aces(values[1])[0], separate_aces(values[1])[1]
+    total = num_cards.reduce(0, :+)
+    total += 10 * (faces_non_aces.size)
+    aces.size.times do |_|
+      total += (total > 12 ? 10 : 1)
     end
     total
   end
@@ -186,7 +190,7 @@ class Game
       break if choice == "n"
       player.hit!(@deck.cards)
       puts "#{player.name} was dealt:"
-      puts card_str(player.hand, (player.hand.size - 1))
+      puts card_str(player.hand, -1)
       puts "#{player.name}'s total score is: #{calc_total(player.hand)} "
       breakline
       break if busted?(player)
