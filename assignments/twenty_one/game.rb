@@ -39,9 +39,15 @@ def all_users_info
   YAML.load_file(user_info_location)
 end
 
-def update_gamelog!(new_info, current_location)
+def add_game_to_log!(new_info, current_location)
   game_file = current_location + "/game_log.yml"
   File.open(game_file, "w") { |file| file.write(new_info.to_yaml) }
+end
+
+def update_gamelog!(latest_games)
+  file = datapath + "/game_log.yml"
+  File.delete(file)
+  add_game_to_log!(latest_games, datapath)
 end
 
 helpers do
@@ -81,13 +87,13 @@ helpers do
     total = num_cards.reduce(0, :+)
     total += 10 * (faces_non_aces.size)
     aces.size.times do |_|
-      total += (total > 12 ? 10 : 1)
+      total += (total > 12 ? 1 : 10)
     end
     total
   end
 
   def scores(players)
-    scores = players.each_with_object([]) do |plyr, arr|
+    players.each_with_object([]) do |plyr, arr|
       arr << "#{plyr.name}: #{score(plyr.hand)}"
     end
   end
@@ -145,9 +151,11 @@ get "/new/game" do
   @game.deal_initial_cards
   
   @games << hashify_game_for_storage(@game_id, @game)
-  update_gamelog!(@games, datapath)
+  add_game_to_log!(@games, datapath)
 
-  session[:message] = "Initial cards were dealt! Current score: #{scores(@game.players)[0]} vs Dealer: ? Enter hit to draw another card."
+  msg_pt1 = "Initial cards were dealt! Current score: #{scores(@game.players)[0]} "
+  msg_pt2 = "vs Dealer: ? Enter hit to draw another card."
+  session[:message] = msg_pt1 + msg_pt2
   
   erb :play
 end
@@ -168,6 +176,13 @@ post "/game/:game_id/hit" do
   @user.hit!(@game.deck.cards)
   @game.find_players_scores
   @last_card = @game.card_str(@user.hand, -1)
+
+  @updated_games = current_gamelog.select do |game|
+    game[:game_id] != @game_id
+  end
+  @updated_games << hashify_game_for_storage(@game_id, @game)
+  update_gamelog!(@updated_games)
+
   session[:message] = "You pulled the: #{@last_card}. Your new score is: #{score(@user.hand)}. #{@user.hand}"
 
   redirect "/game/:game_id"
