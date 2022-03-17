@@ -44,10 +44,17 @@ def add_game_to_log!(new_info, current_location)
   File.open(game_file, "w") { |file| file.write(new_info.to_yaml) }
 end
 
-def update_gamelog!(latest_games)
+def update_gamelog!(updated_game, id)
+  recreated_games = current_gamelog.select do |game|
+    game[:game_id] != id
+  end
+
+  recreated_games << hashify_game_for_storage(id, updated_game)
+
   file = datapath + "/game_log.yml"
   File.delete(file)
-  add_game_to_log!(latest_games, datapath)
+  
+  add_game_to_log!(recreated_games, datapath)
 end
 
 helpers do
@@ -139,6 +146,14 @@ def find_game(id)
   end
 end
 
+def bust_or_score_msg(score, name="Dealer")
+  name_suffix = name == "Dealer" ? "' s" : "r"
+  case score
+  when 2..21 then "#{name + name_suffix} new score is: #{score}"
+  else "#{name} busted! Game over!"
+  end
+end
+
 get "/" do
   erb :main
 end
@@ -177,15 +192,13 @@ post "/game/:game_id/hit" do
   @game.find_players_scores
   @last_card = @game.card_str(@user.hand, -1)
 
-  @updated_games = current_gamelog.select do |game|
-    game[:game_id] != @game_id
-  end
-  @updated_games << hashify_game_for_storage(@game_id, @game)
-  update_gamelog!(@updated_games)
+  update_gamelog!(@game, @game_id)
 
-  session[:message] = "You pulled the: #{@last_card}. Your new score is: #{score(@user.hand)}. #{@user.hand}"
+  msg_pt1 = "You pulled the: #{@last_card}."
+  msg_pt2 = bust_or_score_msg(score(@user.hand), "You")
 
-  redirect "/game/:game_id"
+  session[:message] = msg_pt1 + msg_pt2
+  redirect "/game/#{@game_id}"
 end
 
 post "/game/:game_id/dealers_turn" do
@@ -194,8 +207,27 @@ post "/game/:game_id/dealers_turn" do
 end
 
 post "/game/:game_id/stay" do
-  session[:message] = "You stayed. Dealer's turn!"
-  redirect "/game/:game_id"
+  @game_id = params[:game_id].to_i
+  @game = find_game(@game_id)
+  @dealer = @game.players[1]
+
+  until score(@dealer.hand) >= 17
+    @dealer.hit!(@game.deck.cards)
+  end
+
+  @game.find_players_scores
+
+  update_gamelog!(@game, @game_id)
+
+  num_drawn = @dealer.hand.size - 2
+  cards_drawn = num_drawn == 1 ? "1 card. " : "#{num_drawn} cards."
+  msg_pt1 = "You stayed! The Dealer drew #{cards_drawn} "
+  msg_pt2 = bust_or_score_msg(score(@dealer.hand))
+  
+  session[:message] = msg_pt1 + msg_pt2
+  redirect "/game/#{@game_id}"
+
+  redirect "/game/#{@game_id}"
 end
 
 get "/users/login" do
@@ -221,5 +253,3 @@ post "/users/logout" do
   session[:message] = "Successful logout."
   redirect "/"
 end
-
-

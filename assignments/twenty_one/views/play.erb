@@ -1,3 +1,20 @@
+<% if session[:message].match(/(Initial cards|You pulled)/) %>
+  <div>
+    <form action="/game/<%= @game_id %>/hit" method="post">
+      <button type="submit">Hit</button>
+    </form>
+    <form action="/game/<%= @game_id %>/stay" method="post">
+      <button type="submit">Stay</button>
+    </form>
+  </div>
+<% else %>
+  <p>
+    <a href="/new/game">Play Again</a>
+    <br>
+    <a href="/">Homepage</a>
+  </p>
+<% end %>
+
 <div style="float: left;margin-right:100px">
   <table>
     <thead>
@@ -83,12 +100,3 @@
     </tbody>
   </table>
 <% end %>
-
-<div>
-  <form action="/game/<%= @game_id %>/hit" method="post">
-    <button type="submit">Hit</button>
-  </form>
-  <form action="/game/<%= @game_id %>/stay" method="post">
-    <button type="submit">Stay</button>
-  </form>
-</div>

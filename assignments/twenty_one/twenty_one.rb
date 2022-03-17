@@ -175,7 +175,7 @@ class Game
     total = num_cards.reduce(0, :+)
     total += 10 * (faces_non_aces.size)
     aces.size.times do |_|
-      total += (total > 12 ? 10 : 1)
+      total += (total > 12 ? 1 : 10)
     end
     total
   end
