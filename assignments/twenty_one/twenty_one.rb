@@ -58,22 +58,48 @@ class Game
     msg_if_bust_found
   end
 
+  def find_winning_plyr_index(scores)
+    diffs = scores.map { |num| 21 - num }
+    abs_diffs = diffs.map do |diff|
+      multiplier = (diff < 0 ?  -1 : 1)
+      diff * multiplier
+    end
+    return [0, 1] if abs_diffs.uniq.size == 1
+    index_of_winner = abs_diffs.index(abs_diffs.min)
+    index_of_winner
+  end
+
+  def bust_winner_or_nil
+    bust_winner = nil
+    @players.each_with_index do |plyr, idx|
+      opponent_idx = (idx == 0 ? 1 : 0)
+      bust_winner = @players[opponent_idx] if busted?(plyr)
+    end
+    bust_winner
+  end
+
+  def plyr_scores_arr
+    @players.each_with_object([]) do |plyr, arr|
+      arr << calc_total(plyr.hand)
+    end
+  end
+
   def find_winner
-    x1_score = calc_total(@players[0].hand)
-    x2_score = calc_total(@players[1].hand)
-    if x1_score < x2_score
-      @players[0].name
-    elsif x1_score > x2_score
-      @players[1].name
-    else
+    return bust_winner_or_nil if bust_winner_or_nil
+
+    winner_idx = find_winning_plyr_index(plyr_scores_arr)
+    if winner_idx == [0, 1]
       "tie"
+    else
+      @players[winner_idx].name
     end
   end
 
   def declare_winner_msg(winner, loser)
     puts "The final score is:"
-    puts "#{winner.name}: #{calc_total(winner.hand)}"
-    puts "#{loser.name}: #{calc_total(loser.hand)}"
+    [winner, loser].each do |plyr|
+      puts "#{plyr.name}: #{calc_total(plyr.hand)}"
+    end
     puts "#{winner.name} won!"
   end
 
@@ -136,8 +162,7 @@ class Game
   def initial_card_display
     player = @players[0]
     puts "#{player.name} was dealt:"
-    puts card_str(player.hand, 0)
-    puts card_str(player.hand, 1)
+    [0, 1].each { |card_idx| puts card_str(player.hand, card_idx) }
     breakline
     dealer_hand_initial_display
   end
@@ -202,5 +227,5 @@ class Game
   end
 end
 
-#game1 = Game.new(Deck.new, Participant.new("player"), Participant.new("dealer"))
+#game1 = Game.new(Deck.new, Participant.new("gamer"), Participant.new("dealer"))
 #game1.begin

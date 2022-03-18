@@ -5,6 +5,7 @@ require "tilt/erubis"
 require "yaml"
 require "bcrypt"
 require "./twenty_one.rb"
+require 'pry'
 
 configure do
   enable :sessions
@@ -149,8 +150,8 @@ end
 def bust_or_score_msg(score, name="Dealer")
   name_suffix = name == "Dealer" ? "' s" : "r"
   case score
-  when 2..21 then "#{name + name_suffix} new score is: #{score}"
-  else "#{name} busted! Game over!"
+  when 2..21 then "#{name + name_suffix} score is: #{score}"
+  else "#{name} busted! Game over"
   end
 end
 
@@ -222,9 +223,10 @@ post "/game/:game_id/stay" do
   num_drawn = @dealer.hand.size - 2
   cards_drawn = num_drawn == 1 ? "1 card. " : "#{num_drawn} cards."
   msg_pt1 = "You stayed! The Dealer drew #{cards_drawn} "
-  msg_pt2 = bust_or_score_msg(score(@dealer.hand))
+  msg_pt2 = bust_or_score_msg(score(@dealer.hand)) + ". "
+  msg_pt3 = @game.find_winner == "tie" ? "It was a tie!" : @game.find_winner + " won!"
   
-  session[:message] = msg_pt1 + msg_pt2
+  session[:message] = msg_pt1 + msg_pt2 + msg_pt3
   redirect "/game/#{@game_id}"
 
   redirect "/game/#{@game_id}"

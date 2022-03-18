@@ -1,21 +1,26 @@
-<% if session[:message].match(/(Initial cards|You pulled)/) %>
-  <div>
-    <form action="/game/<%= @game_id %>/hit" method="post">
+<% if session[:message].match(/(busted!|You stayed)/) %>
+  <div style="float: left; padding-right: 50px">
+    <a href="/new/game">Play Again</a>
+    <a href="/">Homepage</a>
+  </div>
+<% else %>
+  <div style="float: left; padding-left: 50px; padding-right: 180px"> 
+    <form class="inline" action="/game/<%= @game_id %>/hit" method="post">
       <button type="submit">Hit</button>
     </form>
-    <form action="/game/<%= @game_id %>/stay" method="post">
+  </div>
+  <div style="float: left;">
+    <form class="inline" action="/game/<%= @game_id %>/stay" method="post">
       <button type="submit">Stay</button>
     </form>
   </div>
-<% else %>
-  <p>
-    <a href="/new/game">Play Again</a>
-    <br>
-    <a href="/">Homepage</a>
-  </p>
 <% end %>
 
-<div style="float: left;margin-right:100px">
+<br>
+<br>
+<br>
+
+<div style="float: left;margin-right:100px;">
   <table>
     <thead>
       <tr>
@@ -33,7 +38,7 @@
       </tr>
       <tr></tr>
       <tr>
-        <td>
+        <td colspan="6">
           <p><%= players_hand(@game, 1)[0][1] %></p>
         </td>
       </tr>
@@ -65,7 +70,7 @@
   </table>
 </div>
 
-<div style="float: left;margin-right:100px">
+<div style="float: left;margin-right:100px;">
    <table>
     <thead>
       <tr>
