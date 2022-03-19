@@ -16,24 +16,39 @@
 <table>
   <thead>
     <tr>
-      <th colspan="12"><h2>Leaderboard:</h2></th>
+      <td>
+        <th colspan="30"><h2>Leaderboard:</h2></th>
+      </td>
     </tr>
     <tr>
+      <% ["Player", "Games Played", "Win Rate"].each do |column_title| %>
       <td>
-        <th colspan="6"><h4>Player</h4></th>
+        <th colspan="8">
+          <h3>
+            <%= column_title %>
+          </h3>
+        </th>
       </td>
-      <td>
-        <th colspan="6"><h4>Games Won</h4></th>
-      </td>
+      <% end %>
     </tr>
   </thead>
   <tbody>
-    <% @players.each do |name| %>
-    <tr>
-      <td colspan="6">
-        <p><%= name %></p>
-      </td>
-    </tr>
+    <% @wins_plays_counts.each do |player_profile| %>
+      <tr>
+        <td colspan="8">
+          <th><%= player_profile[0] %></th>
+        </td>
+        <td colspan="8">
+          <th><%= player_profile[1][:plays] %></th>
+        </td>
+        <div class="green">
+          <td colspan="8">
+            <th class="green" >
+              <%= format_win_rate(player_profile)  %>
+            </th>
+          </td>
+        </div>
+      </tr>
     <% end %>
   </tbody>
 </table>

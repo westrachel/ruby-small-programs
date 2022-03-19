@@ -6,8 +6,3 @@
 td, th {
     text-align: center; 
 }
-
-#game_score { 
-   float:left;
-   display:inline;
-}

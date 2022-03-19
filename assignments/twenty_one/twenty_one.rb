@@ -17,12 +17,10 @@ end
 
 class Participant
   attr_reader :name, :hand
-  attr_accessor :current_score
 
   def initialize(name)
     @name = name
     @hand = []
-    @current_score = 0
   end
 
   def hit!(deck)
@@ -33,11 +31,12 @@ end
 
 class Game
   attr_accessor :deck
-  attr_reader :players
+  attr_reader :players, :winner
 
   def initialize(deck, player, dealer)
     @players = [player, dealer]
     @deck = deck
+    @winner = ""
   end
 
   def breakline
@@ -73,7 +72,7 @@ class Game
     bust_winner = nil
     @players.each_with_index do |plyr, idx|
       opponent_idx = (idx == 0 ? 1 : 0)
-      bust_winner = @players[opponent_idx] if busted?(plyr)
+      bust_winner = @players[opponent_idx].name if busted?(plyr)
     end
     bust_winner
   end
@@ -82,6 +81,10 @@ class Game
     @players.each_with_object([]) do |plyr, arr|
       arr << calc_total(plyr.hand)
     end
+  end
+
+  def set_winner
+    @winner = find_winner
   end
 
   def find_winner
@@ -167,16 +170,9 @@ class Game
     dealer_hand_initial_display
   end
 
-  def find_players_scores
-    @players.each do |player|
-      player.current_score = calc_total(player.hand)
-    end
-  end
-
   def initial_score_display
-    find_players_scores
     puts "The current score is:"
-    puts ">> #{@players[0].name}: #{@players[0].current_score}"
+    puts ">> #{@players[0].name}: #{calc_total(@players[0].hand)}"
     puts ">> #{@players[1].name} has an unknown total"
   end
 

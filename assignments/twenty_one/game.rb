@@ -19,8 +19,9 @@ end
 
 before do
   @games = current_gamelog
-  player_objects = current_gamelog.map { |game| game[:game].players }.flatten
-  @players = player_objects.map { |plyr| plyr.name }.uniq
+  @player_objects = current_gamelog.map { |game| game[:game].players }.flatten
+  @players = @player_objects.map { |plyr| plyr.name }.uniq
+  @winners = current_gamelog.map { |game| game[:game].winner}.flatten
 end
 
 def datapath
@@ -105,6 +106,19 @@ helpers do
       arr << "#{plyr.name}: #{score(plyr.hand)}"
     end
   end
+
+  def rate_color_scheme(rate)
+    rate >= 0.6 ? "green" : "red"
+  end
+
+  def win_rate(plyr_array)
+    plyr_array[1][:wins].to_f / plyr_array[1][:plays].to_f
+  end
+
+  def format_win_rate(plyr_array)
+    rate = win_rate(plyr_array)
+    (rate * 100).round(1).to_s + "%" 
+  end
 end
 
 def valid_user_info?(username, password)
@@ -156,6 +170,15 @@ def bust_or_score_msg(score, name="Dealer")
 end
 
 get "/" do
+  @wins_plays_counts = @players.each_with_object({}) do |name, hsh|
+    num_times_played = @player_objects.select { |player| player.name == name }.size
+    hsh[name] = { :wins => @winners.count(name), :plays => num_times_played }
+  end
+    
+  @wins_plays_counts = @wins_plays_counts.sort_by do |player, profile|
+    profile[:wins]
+  end.reverse
+
   erb :main
 end
 
@@ -190,8 +213,9 @@ post "/game/:game_id/hit" do
   @game = find_game(@game_id)
   @user = @game.players[0]
   @user.hit!(@game.deck.cards)
-  @game.find_players_scores
   @last_card = @game.card_str(@user.hand, -1)
+
+  @game.set_winner if @game.busted?(@user)
 
   update_gamelog!(@game, @game_id)
 
@@ -216,15 +240,14 @@ post "/game/:game_id/stay" do
     @dealer.hit!(@game.deck.cards)
   end
 
-  @game.find_players_scores
-
-  update_gamelog!(@game, @game_id)
-
   num_drawn = @dealer.hand.size - 2
   cards_drawn = num_drawn == 1 ? "1 card. " : "#{num_drawn} cards."
   msg_pt1 = "You stayed! The Dealer drew #{cards_drawn} "
   msg_pt2 = bust_or_score_msg(score(@dealer.hand)) + ". "
-  msg_pt3 = @game.find_winner == "tie" ? "It was a tie!" : @game.find_winner + " won!"
+  winner = @game.set_winner
+  msg_pt3 = winner == "tie" ? "It was a tie!" : winner + " won!"
+
+  update_gamelog!(@game, @game_id)
   
   session[:message] = msg_pt1 + msg_pt2 + msg_pt3
   redirect "/game/#{@game_id}"

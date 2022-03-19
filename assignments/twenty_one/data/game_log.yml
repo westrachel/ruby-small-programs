@@ -6,32 +6,136 @@
       name: gamer
       hand:
       - - spades
-        - queen
-      - - hearts
-        - 5
-      current_score: 15
+        - 4
+      - - spades
+        - king
+      - - spades
+        - 2
+      - - spades
+        - 3
     - !ruby/object:Participant
       name: Dealer
       hand:
+      - - diamonds
+        - 5
+      - - spades
+        - 6
       - - clubs
-        - 7
-      - - diamonds
-        - 9
-      - - diamonds
-        - king
-      current_score: 26
+        - jack
     deck: !ruby/object:Deck
       cards:
         clubs: &1
         - 1
-        - 2
-        - 3
-        - 4
-        - 6
+        - 7
         - 8
+        - 9
         - 10
-        - jack
+        - queen
         - ace
         diamonds: *1
         hearts: *1
         spades: *1
+    winner: Dealer
+- :game_id: 1
+  :game: !ruby/object:Game
+    players:
+    - !ruby/object:Participant
+      name: gamer
+      hand:
+      - - spades
+        - 5
+      - - spades
+        - ace
+    - !ruby/object:Participant
+      name: Dealer
+      hand:
+      - - clubs
+        - queen
+      - - clubs
+        - 1
+      - - spades
+        - 2
+      - - diamonds
+        - jack
+    deck: !ruby/object:Deck
+      cards:
+        clubs: &2
+        - 3
+        - 4
+        - 6
+        - 7
+        - 8
+        - 9
+        - 10
+        - king
+        diamonds: *2
+        hearts: *2
+        spades: *2
+    winner: gamer
+- :game_id: 2
+  :game: !ruby/object:Game
+    players:
+    - !ruby/object:Participant
+      name: gamer
+      hand:
+      - - diamonds
+        - 4
+      - - spades
+        - 3
+      - - hearts
+        - king
+    - !ruby/object:Participant
+      name: Dealer
+      hand:
+      - - diamonds
+        - 10
+      - - hearts
+        - 6
+      - - spades
+        - jack
+    deck: !ruby/object:Deck
+      cards:
+        clubs: &3
+        - 2
+        - 7
+        - 8
+        - 9
+        diamonds: *3
+        hearts: *3
+        spades: *3
+    winner: gamer
+- :game_id: 3
+  :game: !ruby/object:Game
+    players:
+    - !ruby/object:Participant
+      name: gamer
+      hand:
+      - - spades
+        - 4
+      - - spades
+        - king
+      - - clubs
+        - 2
+    - !ruby/object:Participant
+      name: Dealer
+      hand:
+      - - hearts
+        - 10
+      - - diamonds
+        - 8
+    deck: !ruby/object:Deck
+      cards:
+        clubs: &4
+        - 1
+        - 3
+        - 5
+        - 6
+        - 7
+        - 9
+        - jack
+        - queen
+        - ace
+        diamonds: *4
+        hearts: *4
+        spades: *4
+    winner: Dealer
