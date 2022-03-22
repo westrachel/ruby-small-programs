@@ -98,11 +98,15 @@ class Game
     end
   end
 
-  def declare_winner_msg(winner, loser)
-    puts "The final score is:"
-    [winner, loser].each do |plyr|
-      puts "#{plyr.name}: #{calc_total(plyr.hand)}"
+  def scores
+    @players.each_with_object([]) do |plyr, arr|
+      arr << "#{plyr.name}: #{calc_total(plyr.hand)}"
     end
+  end
+
+  def declare_winner_msg(winner)
+    puts "The final score is:"
+    scores.each { |name_score| puts name_score }
     puts "#{winner.name} won!"
   end
 

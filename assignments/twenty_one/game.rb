@@ -4,8 +4,7 @@ require "sinatra/content_for"
 require "tilt/erubis"
 require "yaml"
 require "bcrypt"
-require "./twenty_one.rb"
-require 'pry'
+require_relative "./twenty_one.rb"
 
 configure do
   enable :sessions
@@ -34,7 +33,7 @@ end
 
 def all_users_info
   user_info_location = if ENV["RACK_ENV"] == "test"
-                         File.expand_path("../test/users.yml", __FILE__)
+                         File.expand_path("../test/data/users.yml", __FILE__)
                        else
                          File.expand_path("../data/users.yml", __FILE__)
                        end
@@ -90,25 +89,8 @@ helpers do
     values.partition { |value| value == "ace" }
   end
 
-  def score(hand)
-    values = separate_face_cards(hand)
-    num_cards, aces, faces_non_aces = values[0], separate_aces(values[1])[0], separate_aces(values[1])[1]
-    total = num_cards.reduce(0, :+)
-    total += 10 * (faces_non_aces.size)
-    aces.size.times do |_|
-      total += (total > 12 ? 1 : 10)
-    end
-    total
-  end
-
-  def scores(players)
-    players.each_with_object([]) do |plyr, arr|
-      arr << "#{plyr.name}: #{score(plyr.hand)}"
-    end
-  end
-
   def rate_color_scheme(rate)
-    rate >= 0.6 ? "green" : "red"
+    rate >= 0.6 ? "color:#006400" : "color:#9C0A00" 
   end
 
   def win_rate(plyr_array)
@@ -192,7 +174,7 @@ get "/new/game" do
   @games << hashify_game_for_storage(@game_id, @game)
   add_game_to_log!(@games, datapath)
 
-  msg_pt1 = "Initial cards were dealt! Current score: #{scores(@game.players)[0]} "
+  msg_pt1 = "Initial cards were dealt! Current score: #{@game.scores[0]} "
   msg_pt2 = "vs Dealer: ? Enter hit to draw another card."
   session[:message] = msg_pt1 + msg_pt2
   
@@ -220,7 +202,7 @@ post "/game/:game_id/hit" do
   update_gamelog!(@game, @game_id)
 
   msg_pt1 = "You pulled the: #{@last_card}."
-  msg_pt2 = bust_or_score_msg(score(@user.hand), "You")
+  msg_pt2 = bust_or_score_msg(@game.calc_total(@user.hand), "You")
 
   session[:message] = msg_pt1 + msg_pt2
   redirect "/game/#{@game_id}"
@@ -236,14 +218,14 @@ post "/game/:game_id/stay" do
   @game = find_game(@game_id)
   @dealer = @game.players[1]
 
-  until score(@dealer.hand) >= 17
+  until @game.calc_total(@dealer.hand) >= 17
     @dealer.hit!(@game.deck.cards)
   end
 
   num_drawn = @dealer.hand.size - 2
   cards_drawn = num_drawn == 1 ? "1 card. " : "#{num_drawn} cards."
   msg_pt1 = "You stayed! The Dealer drew #{cards_drawn} "
-  msg_pt2 = bust_or_score_msg(score(@dealer.hand)) + ". "
+  msg_pt2 = bust_or_score_msg(@game.calc_total(@dealer.hand)) + ". "
   winner = @game.set_winner
   msg_pt3 = winner == "tie" ? "It was a tie!" : winner + " won!"
 

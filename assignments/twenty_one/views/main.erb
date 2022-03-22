@@ -13,7 +13,7 @@
 <% end %>
 
 
-<table>
+<table style="width: 100%;">
   <thead>
     <tr>
       <td>
@@ -21,7 +21,7 @@
       </td>
     </tr>
     <tr>
-      <% ["Player", "Games Played", "Win Rate"].each do |column_title| %>
+      <% ["Player", "Win Rate", "Games Played"].each do |column_title| %>
       <td>
         <th colspan="8">
           <h3>
@@ -38,15 +38,12 @@
         <td colspan="8">
           <th><%= player_profile[0] %></th>
         </td>
-        <td colspan="8">
-          <th><%= player_profile[1][:plays] %></th>
+        <td colspan="8" style=<%= rate_color_scheme(win_rate(player_profile)) %>>
+            <h4><%= format_win_rate(player_profile)  %></h4>
         </td>
-        <div class="green">
-          <td colspan="8">
-            <th class="green" >
-              <%= format_win_rate(player_profile)  %>
-            </th>
-          </td>
+        <td colspan="8">
+          <h4><%= player_profile[1][:plays] %></h4>
+        </td>
         </div>
       </tr>
     <% end %>
