@@ -233,8 +233,6 @@ post "/game/:game_id/stay" do
   
   session[:message] = msg_pt1 + msg_pt2 + msg_pt3
   redirect "/game/#{@game_id}"
-
-  redirect "/game/#{@game_id}"
 end
 
 get "/users/login" do

@@ -226,6 +226,3 @@ class Game
     calc_total(participant.hand) > 21
   end
 end
-
-#game1 = Game.new(Deck.new, Participant.new("gamer"), Participant.new("dealer"))
-#game1.begin

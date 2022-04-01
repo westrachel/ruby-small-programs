@@ -107,3 +107,74 @@
         hearts: *3
         spades: *3
     winner: Dealer
+- :game_id: 3
+  :game: !ruby/object:Game
+    players:
+    - !ruby/object:Participant
+      name: gamer
+      hand:
+      - - hearts
+        - 3
+      - - hearts
+        - 2
+    - !ruby/object:Participant
+      name: Dealer
+      hand:
+      - - clubs
+        - 8
+      - - clubs
+        - 10
+    deck: !ruby/object:Deck
+      cards:
+        clubs: &4
+        - 1
+        - 4
+        - 5
+        - 6
+        - 7
+        - 9
+        - jack
+        - queen
+        - king
+        - ace
+        diamonds: *4
+        hearts: *4
+        spades: *4
+    winner: Dealer
+- :game_id: 4
+  :game: !ruby/object:Game
+    players:
+    - !ruby/object:Participant
+      name: gamer
+      hand:
+      - - spades
+        - ace
+      - - clubs
+        - 3
+      - - clubs
+        - queen
+      - - diamonds
+        - 7
+    - !ruby/object:Participant
+      name: Dealer
+      hand:
+      - - spades
+        - king
+      - - spades
+        - 5
+      - - hearts
+        - 2
+    deck: !ruby/object:Deck
+      cards:
+        clubs: &5
+        - 1
+        - 4
+        - 6
+        - 8
+        - 9
+        - 10
+        - jack
+        diamonds: *5
+        hearts: *5
+        spades: *5
+    winner: gamer
