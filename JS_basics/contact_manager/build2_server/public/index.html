@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Contact Manager</title>
+  <link rel="stylesheet" type="text/css" href="stylesheets/cm.css"/>
+  <script src="./javascripts/jquery.js"></script>
+  <script src="./javascripts/handlebars.js"></script>
+  <script type="module" src="./javascripts/contact_manager.js"></script>
+  <script id="contacts-template" type="text/x-handlebars-template">
+    {{#each contacts}}
+    <ul id="contactId-{{id}}"><strong>{{full_name}}</strong>
+      <li><strong>Phone Number:</strong>{{phone_number}}</li>
+      <li><strong>Email:</strong>{{email}}</li>
+      <li><strong>Tags:</strong>{{tags}}</li>
+      <li><a href="/#contacts/edit/{{id}}">Edit</a></li>
+      <li><a href="/#contacts/delete/{{id}}">Delete</a></li>
+    </ul>
+    {{/each}}
+  </script>
+  <script id="contact-form-template" type="text/x-handlebars-template">
+    <form id={{id}} class="hide" action="#" method="post">
+      <h2>{{title}}</h2>
+      <fieldset>
+        Fullname:<input type="text" id="full_name" name="full_name" {{{full_name}}} required/>
+        Email address:<input type="text" id="email" name="email" {{{email}}} required/>
+        Phone Number:<input type="text" id="phone_number" name="phone_number" {{{phone_number}}} required/>
+        Enter Tags (family, friend, work, & neighbor) Comma-Separated:<input type="text" id="tags" name="tags" {{{tags}}} required/>
+        <input type="hidden" id="id" name="id" {{{idValue}}}/>
+        <button type="submit">Submit</button>
+        <button type="button">Cancel</button>
+      </fieldset>
+    </form>
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Contact Manager</h1>
+    <div class="add-search-container">
+      <a href="#contacts/new" class="add-contact">Add Contact</a>
+      <input type="text" class="search" placeholder="Search By Name"/>
+      <button type="button" class="search-filter-removal hide">Remove Name Search Filter</button>
+      <div class="filter-container">
+        <div class='tag-filters'>
+          <p>Filter By Tag:</p>
+          <button type="button">Work</button>
+          <button type="button">Friend</button>
+          <button type="button">Neighbor</button>
+          <button type="button">Family</button>
+        </div>
+        <div class="reset-tag-filters hide">
+          <button type="button">Remove Tag Filter</button>
+          <p>Showing all contacts for the tag: <strong></strong></p>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="main-container">
+    <div class="contacts-container">
+      <div class="empty-contacts">
+        <h3>There are no contacts.</h3>
+        <a href="#contacts/new" class="add-contact">Add Contact</a>
+      </div>
+      <div class="all-contacts">
+      </div>
+    </div>
+    <div class="empty-search-contacts hide">
+      <p>
+        There are no contacts starting with <strong></strong>.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+.todo {
+  width: 500px;
+  padding: 10px;
+  border: 2px solid black;
+  margin: 0;
+}
+
+button {
+  background: url(icon_delete.png);
+}
+
+.hide {
+  display: none;
+}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Todo List</title>
+  <link rel="stylesheet" type="text/css" href="stylesheets/cd.css"/>
+  <script src="../../contact_manager/build2_server/public/javascripts/handlebars.js"></script>
+  <script type="module" src="./javascripts/custom_delete.js"></script>
+  <script id="todo_template" type="text/x-handlebars-template">
+    <div class="todo">
+      {{title}}
+      <button id="{{id}}" type="button"></button>
+    </div>
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Todos</h1>
+  </header>
+  <div class="todo_items">
+  </div>
+</body>
+</html>
