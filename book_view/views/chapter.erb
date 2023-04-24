@@ -1,0 +1,5 @@
+<h2 class="content-subhead"><%= @title %></h2>
+
+<% in_paragraphs(@chapter_contents).each_with_index do |paragraph, idx| %>
+  <p id="paragraph<%= idx %>"><%= paragraph %></p>
+<% end %>
