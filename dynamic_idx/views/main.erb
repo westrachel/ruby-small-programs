@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+  <div id="layout">
+    <div id="main">
+      <div class="header">
+        <h1>Choose a Fortune Cookie:</h1>
+      </div>
+
+      <div class="content">
+
+      <div class="pure-main">
+        <ul class="pure-main-list">
+          <% @files.each do |filename| %>
+            <li class="pure-main-item">
+              <a href="/<%= filename %>" class="pure-menu-link"><%= filename %></a>
+            </li>
+          <% end %>
+        </ul>
+            
+        <p>
+          <% if params[:sort] == "descending" %>
+            <a href="/">Sort Ascendingly</a>
+          <% else %>
+            <a href="/?sort=descending">Sort Descendingly</a>
+          <% end %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

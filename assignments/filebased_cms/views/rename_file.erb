@@ -1,0 +1,8 @@
+<form action="/<%= @filename %>/rename" method="post">
+  <label for="new_filename"> Rename: <%= @filename %>:</label>
+    <div>
+      <textarea name="new_filename" id="new_filename" rows="1" cols="20"></textarea>
+    </div>
+  <button type="submit">Rename</button>
+  <a href="/">Cancel</a>
+</form>

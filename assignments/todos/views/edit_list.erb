@@ -1,0 +1,43 @@
+<section id="todos">
+  <header>
+    <h3>
+      Revising '<%= @list[:name] %>'
+    </h3>
+    <ul>
+      <li>
+        <form class="delete" action="/lists/<%= @list_id %>/delete" method="post">
+          <button type="submit" class="delete">Delete List</button>
+        </form>
+      </li>
+    </ul>
+  </header>
+</section>
+
+<form action="/lists/<%= @list_id %>" method="post">
+  <dl>
+    <dt>
+      <label for="revised_list_name">Revise name of the list: </label>
+    </dt>
+    <dd>
+      <input name="revised_list_name" placeholder="List Name" type="text" value="<%= params[:revised_list_name] || @list[:name] %>">
+    </dd>
+  </dl>
+  <fieldset class="actions">
+    <input type="submit" value="Save">
+    <a href="/lists/<%= @list_id %>">Cancel</a>
+  </fieldset>
+</form>
+
+<form action="/lists/<%= @list_id %>/todos" method="post">
+  <dl>
+    <dt>
+      <label for="todo">Add a new todo item to this list:</label>
+    </dt>
+    <dd>
+      <input name="todo" id="todo" placeholder="Something to do" type="text" value="<%= params[:todo] %>">
+    </dd>
+  </dl>
+  <fieldset class="actions">
+    <input type="submit" value="Add">
+  </fieldset>
+</form>

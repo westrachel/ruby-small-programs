@@ -1,0 +1,71 @@
+---
+- :game_id: 0
+  :game: !ruby/object:Game
+    players:
+    - !ruby/object:Participant
+      name: test
+      hand:
+      - - hearts
+        - 3
+      - - hearts
+        - 2
+      - - clubs
+        - 5
+      - - diamonds
+        - queen
+    - !ruby/object:Participant
+      name: Dealer
+      hand:
+      - - clubs
+        - 8
+      - - clubs
+        - 10
+    deck: !ruby/object:Deck
+      cards:
+        clubs: &1
+        - 1
+        - 4
+        - 6
+        - 7
+        - 9
+        - jack
+        - king
+        - ace
+        diamonds: *1
+        hearts: *1
+        spades: *1
+    winner: test
+- :game_id: 1
+  :game: !ruby/object:Game
+    players:
+    - !ruby/object:Participant
+      name: test
+      hand:
+      - - hearts
+        - king
+      - - diamonds
+        - jack
+    - !ruby/object:Participant
+      name: Dealer
+      hand:
+      - - clubs
+        - 8
+      - - clubs
+        - 4
+    deck: !ruby/object:Deck
+      cards:
+        clubs: &2
+        - 1
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 9
+        - 10
+        - queen
+        - ace
+        diamonds: *2
+        hearts: *2
+        spades: *2
+    winner: ''
